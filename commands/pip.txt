@@ -1,0 +1,8 @@
+pip install handcalcs
+pip install forallpeople
+pip install PyNiteFEA
+pip install pandas
+pip install "fastapi[standard]"
+pip install pywin32
+pip install comtypes
+pip install jupyter
