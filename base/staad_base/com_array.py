@@ -1,3 +1,5 @@
+# https://learn.microsoft.com/en-us/windows/win32/wmisdk/numbers
+
 from comtypes import automation
 import ctypes
 
@@ -35,5 +37,3 @@ def make_variant_vt_ref(obj, var_type):
     var._.c_void_p = ctypes.addressof(obj)
     var.vt = var_type | automation.VT_BYREF
     return var
-
-# https://learn.microsoft.com/en-us/windows/win32/wmisdk/numbers

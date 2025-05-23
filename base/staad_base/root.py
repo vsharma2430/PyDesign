@@ -51,8 +51,46 @@ def get_openSTAAD():
     property._FlagAsMethod('AssignBeamProperty')
     property._FlagAsMethod('CreateAssignProfileProperty')
 
-    #nodal load
+    #loads
+    load._FlagAsMethod("GetPrimaryLoadCaseCount")
+    load._FlagAsMethod("GetPrimaryLoadCaseNumbers")
+    load._FlagAsMethod("SetLoadActive")
+
+    #load case operations
+    load._FlagAsMethod("ClearPrimaryLoadCase")
+    load._FlagAsMethod("ClearReferenceLoadCase")
+    load._FlagAsMethod("CreateLoadList")
+    load._FlagAsMethod("CreateNewPrimaryLoad")
+    load._FlagAsMethod("CreateNewPrimaryLoadEx")
+    load._FlagAsMethod("CreateNewPrimaryLoadEx2")
+    load._FlagAsMethod("DeleteLoadList")
+    load._FlagAsMethod("DeletePrimaryLoadCases")
+    load._FlagAsMethod("DeleteReferenceLoadCases")
+    load._FlagAsMethod("GetActiveLoad")
+    load._FlagAsMethod("GetAssignmentListForLoadType")
+    load._FlagAsMethod("GetAttribute")
+    load._FlagAsMethod("GetListSizeForLoadType")
+    load._FlagAsMethod("GetLoadCaseTitle")
+    load._FlagAsMethod("GetLoadCountInLoadList")
+    load._FlagAsMethod("GetLoadItemsCount")
+    load._FlagAsMethod("GetLoadItemType")
+    load._FlagAsMethod("GetLoadListCount")
+    load._FlagAsMethod("GetLoadsInLoadList")
+    load._FlagAsMethod("GetLoadType")
+    load._FlagAsMethod("GetLoadTypeCount")
+    load._FlagAsMethod("GetPrimaryLoadCaseNumbers")
+    load._FlagAsMethod("RemoveAttribute")
+    load._FlagAsMethod("SetASDLoadAttribute")
+    load._FlagAsMethod("SetLoadType")
+    load._FlagAsMethod("SetLSDLoadAttribute")
+
+    #self-weight load  
+    load._FlagAsMethod("AddSelfWeightInXYZ")
+    load._FlagAsMethod("AddSelfWeightInXYZToGeometry")
+
+    #nodal load  
     load._FlagAsMethod("AddNodalLoad")
+    load._FlagAsMethod("AddSupportDisplacement")
     load._FlagAsMethod("GetNodalLoadCount")
     load._FlagAsMethod("GetNodalLoadInfo")
     load._FlagAsMethod("GetNodalLoads")
@@ -88,6 +126,6 @@ def get_openSTAAD():
     #output
     output._FlagAsMethod("GetSupportReactions")
 
-    object_dict = {'geometry':geometry,'output':output}
+    object_dict = {'geometry':geometry,'output':output,'load':load,'property':property}
 
     return os,object_dict

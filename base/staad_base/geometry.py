@@ -13,6 +13,14 @@ def get_node_incidence(geometry,nodeNo) -> float:
     geometry.GetNodeIncidence(int(nodeNo),xptr,yptr,zptr)
     return round(x.value,point_precision),round(y.value,point_precision),round(z.value,point_precision)
 
+def get_node_incidences(geometry) -> float:
+    result = []
+    node_nos = get_node_nos(geometry=geometry)
+    for nodeNo in node_nos:
+        node_incidence = get_node_incidence(geometry=geometry,nodeNo=nodeNo[1])
+        result.append((nodeNo,node_incidence))
+    return result
+
 def get_node_nos(geometry,tuple:bool=True) -> list:
     beamCount = get_node_count(geometry=geometry)
     safe_array_beam_list = make_safe_array_long(beamCount)
@@ -59,3 +67,10 @@ def get_beam_nos(geometry) -> list:
             result.append({'id':beam[0],'no':beam[1]})
     return result
 
+def get_beam_incidences(geometry) -> float:
+    result = []
+    beam_nos = get_beam_nos(geometry=geometry)
+    for beamNo in beam_nos:
+        beam_incidence = get_beam_incidence(geometry=geometry,beamNo=beamNo[1])
+        result.append((beamNo,beam_incidence))
+    return result
