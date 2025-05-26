@@ -1,8 +1,8 @@
-from staad_base.root import *
-from staad_base.geometry import *
-from staad_base.load import *
-from staad_base.com_array import *
-from staad_base.helper import *
+from base.staad_base.root import *
+from base.staad_base.geometry import *
+from base.staad_base.load import *
+from base.staad_base.com_array import *
+from base.staad_base.helper import *
 
 class TransformLoadCase:
     def __init__(self, id, source, destination, predicate, direction):
@@ -23,7 +23,7 @@ def convert_force_operation (openSTAAD,STAAD_objects,transform_load_case_object)
         direction = transform_load_case_object.direction
         predicate = transform_load_case_object.predicate
 
-        load_object = STAAD_objects['load']
+        load_object = STAAD_objects.load
 
         for load_case_i in [source]:
             set_load_case_active(load_object,load_case_i)

@@ -23,7 +23,15 @@ ANALYSIS_STATUS_MESSAGES = {
     5: "Analysis has not been performed"
 }
 
-def get_openSTAAD():
+class OpenSTAAD_objects:
+    def __init__(self, geometry=None, output=None, load=None, property=None, design=None):
+        self.geometry = geometry if geometry is not None else {}
+        self.output = output if output is not None else {}
+        self.load = load if load is not None else {}
+        self.property = property if property is not None else {}
+        self.design = design if design is not None else {}
+
+def get_openSTAAD() -> OpenSTAAD_objects:
     os = client.GetActiveObject("StaadPro.OpenSTAAD")
 
     geometry = os.Geometry
@@ -207,9 +215,7 @@ def get_openSTAAD():
     output._FlagAsMethod("IsMultipleMemberSteelDesignResultsAvailable")
     output._FlagAsMethod("AreResultsAvailable")
 
-    object_dict = {'geometry':geometry,'output':output,'load':load,'property':property,'design':design}
-
-    return os,object_dict
+    return os,OpenSTAAD_objects(geometry=geometry,output=output,load=load,property=property,design=design)
 
 def run_analysis(openSTAAD,silent=1,hidden=0,wait=0,wait_interval=5):
     retVal = openSTAAD.AnalyzeEx(silent,hidden,wait)
