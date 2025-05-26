@@ -27,4 +27,12 @@ def design_details(code:str=None,clause=None,units=None):
         return wrap
     return decorator 
 
+def print(func): 
+    '''Decorator that prints in a single line in jupyer'''
+    def wrap(*args, **kwargs): 
+        result = func(*args, **kwargs) 
+        print(result) 
+        return result 
+    return wrap 
+
 

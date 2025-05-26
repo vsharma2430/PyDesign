@@ -1,8 +1,8 @@
-from root import *
-from geometry import *
-from load import *
-from com_array import *
-from helper import *
+from staad_base.root import *
+from staad_base.geometry import *
+from staad_base.load import *
+from staad_base.com_array import *
+from staad_base.helper import *
 
 class TransformLoadCase:
     def __init__(self, id, source, destination, predicate, direction):

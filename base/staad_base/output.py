@@ -1,4 +1,4 @@
-from com_array import *
+from staad_base.com_array import *
 
 def get_support_reaction(output,nodeNo, loadcaseNo):
     safe_array_reactions = make_safe_array_double(6)

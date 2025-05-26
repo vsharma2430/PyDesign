@@ -1,6 +1,6 @@
-from com_array import *
 from enum import IntEnum
-from helper import *
+from base.staad_base.com_array import *
+from base.staad_base.helper import *
 
 open_array = lambda array,index=1 : [x[index] for x in enumerate(array)]
 

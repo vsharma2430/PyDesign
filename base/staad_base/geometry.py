@@ -1,9 +1,13 @@
-from com_array import *
+from base.staad_base.com_array import *
 
 point_precision = 3
 
 def get_node_count(geometry) -> int:
     nodeCount = geometry.GetNodeCount()
+    return nodeCount
+
+def get_selected_beam_count(geometry) -> int:
+    nodeCount = geometry.GetNoOfSelectedBeams()
     return nodeCount
 
 def get_node_incidence(geometry,nodeNo) -> float:
@@ -53,7 +57,7 @@ def get_beam_incidence(geometry,beamNo) -> float:
     geometry.GetMemberIncidence(int(beamNo),nodeAptr,nodeBptr)
     return nodeA.value,nodeB.value
 
-def get_beam_nos(geometry) -> list:
+def get_beam_nos(geometry,tuple:bool = False) -> list:
     beamCount = get_beam_count(geometry=geometry)
     safe_array_beam_list = make_safe_array_long(beamCount)
     beams = make_variant_vt_ref(safe_array_beam_list, automation.VT_ARRAY | automation.VT_I4) # signed 32 bit integer
@@ -64,7 +68,21 @@ def get_beam_nos(geometry) -> list:
         if(tuple):
             result.append((beam[0],beam[1]))
         else:
-            result.append({'id':beam[0],'no':beam[1]})
+            result.append(beam[1])
+    return result
+
+def get_selected_beam_nos(geometry,sort:int=1,tuple:bool = False) -> list:
+    beamCount = get_selected_beam_count(geometry=geometry)
+    safe_array_beam_list = make_safe_array_long(beamCount)
+    beams = make_variant_vt_ref(safe_array_beam_list, automation.VT_ARRAY | automation.VT_I4) # signed 32 bit integer
+    geometry.GetSelectedBeams(beams,sort)
+    beams = beams[0]
+    result = []
+    for beam in enumerate(beams):
+        if(tuple):
+            result.append((beam[0],beam[1]))
+        else:
+            result.append(beam[1])
     return result
 
 def get_beam_incidences(geometry) -> float:

@@ -20,6 +20,9 @@ def get_ctype_float(tuple:bool=True):
 def get_ctype_double(tuple:bool=True):
     return get_ctype(type=ctypes.c_double,tuple=tuple)
 
+def get_ctype_string(tuple:bool=True):
+    return get_ctype(type=ctypes.c_char,tuple=tuple)
+
 def make_safe_array_int(size): 
     return automation._midlSAFEARRAY(ctypes.c_int).create([0]*size)
 
