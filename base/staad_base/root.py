@@ -119,6 +119,7 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     property._FlagAsMethod('GetSectionTableNo')
     
     property._FlagAsMethod('AssignBeamProperty')
+    property._FlagAsMethod('GetBeamSectionPropertyRefNo	')
     property._FlagAsMethod('CreateAssignProfileProperty')
 
     #loads
