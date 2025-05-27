@@ -97,7 +97,6 @@ class LoadItemNo(IntEnum):
     RepeatLoad = 4200
     NotionalLoad = 4222
 
-
 def get_load_count(load) -> int:
     loadCount = load.GetPrimaryLoadCaseCount()
     return loadCount 

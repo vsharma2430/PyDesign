@@ -15,3 +15,6 @@ def first_non_zero(lst)->float:
 
 def convert_kn_to_mt(x):
     return x*0.10197162129779283
+
+def unique_list(x):
+    return list(dict.fromkeys(x))
