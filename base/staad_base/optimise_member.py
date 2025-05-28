@@ -48,11 +48,21 @@ def get_failed_members(ratios: Dict[str, float], threshold: float = 1.0) -> List
     return [(member,ratio) for member, ratio in ratios.items() if ratio >= threshold]
 
 class member_group:
-    def __init__(self,Staad_objects:OpenSTAAD_objects, id=None, members=None, profiles=None, preference=None,allowable_ratio=0.8):
+    def __init__(self,Staad_objects:OpenSTAAD_objects, id=None, members=None,exclude_members=None, profiles=None, preference=None,allowable_ratio=0.8):
         self.id = id
         self.geometry = Staad_objects.geometry
         self.property = Staad_objects.property
         self.output = Staad_objects.output
+
+        # Process exclude_members first
+        self.exclude_members = unique_list(exclude_members) if exclude_members is not None else []
+        
+        # Process members and remove any that are in exclude_members
+        if members is not None:
+            initial_members = unique_list(members)
+            self.members = [member for member in initial_members if member not in self.exclude_members]
+        else:
+            self.members = []
 
         self.members = unique_list(members) if members is not None else []
         self.profiles = unique_list(profiles) if profiles is not None else []
@@ -75,7 +85,42 @@ class member_group:
                 result = assign_beam_property(self.property,beam_no=member,property_no=self.preference)
             print(f'Assignment of {self.preference} to {self.members}')
                 
-    def get_utilization_ratios(self,index):
+    def get_utilization_ratios_for_profile(self,index):
+        """
+        Process steel design results with statistics
+        """
+        result = {}
+        design_result = get_member_steel_design_results(self.output, self.members)
+        
+        for member in self.members:
+            if member in design_result:
+                result[member] = design_result[member]['critical_ratio']  # Fixed key access
+        
+        # Calculate statistics
+        avg = calculate_average(result)
+        dev = calculate_deviation(result)
+        failed_list = get_failed_members(result,threshold=self.allowable_ratio)
+        failed_list.sort(key=lambda x: x[1],reverse=True)
+        
+        self.results[index] = {
+            'profile':self.profiles[index],
+            'failed_members': failed_list,  
+            'failed': len(failed_list),
+            'average': avg,
+            'deviation': dev,
+            'result': result,
+        }
+
+    def get_failed_members_for_profile(self,index):
+        if(index in self.results):
+            if('failed_members' in self.results[index] and self.results[index]['failed_members'] is not None):
+                return [x for (x,y) in  self.results[index]['failed_members']]
+        return []
+    
+    def get_failed_members(self):
+        return [x for (x,y) in  self.results['failed_members']]
+
+    def get_utilization_ratios(self):
         """
         Process steel design results with statistics
         """
@@ -91,19 +136,13 @@ class member_group:
         dev = calculate_deviation(result)
         failed_list = get_failed_members(result,threshold=self.allowable_ratio)
         
-        self.results[index] = {
-            'profile':self.profiles[index],
-            'failed_members': failed_list,  # Optional: list of failed member names
+        self.results = {
+            'failed_members': failed_list,  
             'failed': len(failed_list),
             'average': avg,
             'deviation': dev,
             'result': result,
         }
-
-    # def get_best_profile(self):
-    #     def sort_profiles(key):
-    #         if 
-    #     return self.results.values().sort()
 
     def select_members(self):
         for member in self.members:
@@ -119,6 +158,17 @@ class optimise_groups:
             self.member_groups.append(group)
             return self
         return False
+    
+    def add_list(self, groups):
+        """Add a member_group list object to the groups list."""
+        result = []
+        for group in groups:
+            result.append(self.add(group=group))
+        return result
+
+    def list(self):
+        """Return the list of member_groups."""
+        return self.member_groups
 
     def delete(self, index):
         """Delete a member_group at the specified index."""

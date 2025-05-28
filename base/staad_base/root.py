@@ -195,7 +195,25 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     load._FlagAsMethod("AddWindLoad")
 
     #output
+    output._FlagAsMethod("AreResultsAvailable")
+
+    output._FlagAsMethod("GetBasePressures")
+    output._FlagAsMethod("GetMatInfluenceAreas")
+    output._FlagAsMethod("GetNodeDisplacements")
     output._FlagAsMethod("GetSupportReactions")
+
+    output._FlagAsMethod("GetIntermediateDeflectionAtDistance")
+    output._FlagAsMethod("GetIntermediateMemberAbsTransDisplacements")
+    output._FlagAsMethod("GetIntermediateMemberForcesAtDistance")
+    output._FlagAsMethod("GetIntermediateMemberTransDisplacements")
+    output._FlagAsMethod("GetMaxSectionDisplacement")
+    output._FlagAsMethod("GetMemberEndDisplacements")
+    output._FlagAsMethod("GetMemberEndForces")
+    output._FlagAsMethod("GetMinMaxAxialForce")
+    output._FlagAsMethod("GetMinMaxBendingMoment")
+    output._FlagAsMethod("GetMinMaxShearForce")
+    output._FlagAsMethod("GetPMemberEndForces")
+    output._FlagAsMethod("GetPMemberIntermediateForcesAtDistance")
 
     output._FlagAsMethod("AssignDesignCommand")
     output._FlagAsMethod("AssignDesignGroup")
@@ -214,15 +232,21 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     output._FlagAsMethod("GetSteelDesignParameterBlockCount")
     output._FlagAsMethod("GetSteelDesignParameterBlockNameByIndex")
     output._FlagAsMethod("IsMultipleMemberSteelDesignResultsAvailable")
-    output._FlagAsMethod("AreResultsAvailable")
 
     return os,OpenSTAAD_objects(geometry=geometry,output=output,load=load,property=property,design=design)
 
 def run_analysis(openSTAAD,silent=1,hidden=0,wait=0,wait_interval=5):
+    openSTAAD.SetSilentMode(1)
+
+    time.sleep(wait_interval/2)
+    print('Analysis Started')
+
     retVal = openSTAAD.AnalyzeEx(silent,hidden,wait)
     count = 1
+
     while openSTAAD.IsAnalyzing():
-        time.sleep(5)
+        time.sleep(wait_interval)
         print('Analysis running',''.join(['.'*count]))
         count = count + 1
+        
     return retVal
