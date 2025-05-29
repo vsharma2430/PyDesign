@@ -78,6 +78,7 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     os._FlagAsMethod("UpdateStructure")
 
     #nodes
+    geometry._FlagAsMethod("AddNode")
     geometry._FlagAsMethod("GetNodeCount")
     geometry._FlagAsMethod("GetNodeList")
     geometry._FlagAsMethod("GetNodeIncidence")
@@ -85,6 +86,7 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     geometry._FlagAsMethod("SelectNode")
 
     #beams
+    geometry._FlagAsMethod("AddBeam")
     geometry._FlagAsMethod("GetMemberCount")
     geometry._FlagAsMethod("GetBeamList") 
     geometry._FlagAsMethod("GetBeamLength") 

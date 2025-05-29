@@ -1,12 +1,14 @@
 from base.geometry_base.point import Point3D
 from base.structural_elements.beam import Beam3D
 from base.structural_elements.column import Column3D
+from copy import deepcopy
 
 class PiperackPortal:
-    def __init__(self):
+    def __init__(self,base:Point3D):
         """
         Initialize a Piperack Portal with empty lists of beams and columns.
         """
+        self.base = base
         self.beams = []
         self.columns = []
         self.walkways = []
@@ -19,7 +21,7 @@ class PiperackPortal:
         Add a beam to the piperack portal.
         """
         if type(beam) is Beam3D:
-            self.beams.append(beam)
+            self.beams.append(beam.shift(point=self.base))
         return self
 
     def add_column(self, column: Column3D):
@@ -27,7 +29,7 @@ class PiperackPortal:
         Add a column to the piperack portal.
         """
         if type(column) is Column3D:
-            self.columns.append(column)
+            self.columns.append(column.shift(point=self.base))
         return self
 
     def total_length_of_members(self):
@@ -41,22 +43,27 @@ class PiperackPortal:
             total_length += column.length()
         return total_length
     
-    def shift(self, point : Point3D):
-        """
-        Shift elements by point
-        """
+    def shift(self, point: Point3D):
+        new_portal = deepcopy(self)
+        
+        new_portal.base = self.base.__add__(point)
+        new_portal.beams = []
+        new_portal.columns = []
+        beam:Beam3D
         for beam in self.beams:
-            beam.shift(point)
+            new_portal.beams.append(beam.shift(point))
+            
+        column:Column3D
         for column in self.columns:
-            column.shift(point)
-        return self
+            new_portal.columns.append(column.shift(point))
+
+        return new_portal
 
     def __str__(self):
         """
         Return a string representation of the Piperack Portal.
         """
-        return (f"PiperackPortal(beams={len(self.beams)}, columns={len(self.columns)}, "
-                f"total_length_of_members={self.total_length_of_members():.2f})")
+        return (f"PiperackPortal base={self.base} (beams={len(self.beams)}, columns={len(self.columns)}")
 
     def __repr__(self):
         """

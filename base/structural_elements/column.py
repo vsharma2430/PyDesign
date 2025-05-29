@@ -9,5 +9,5 @@ class Column3D(Beam3D):
         """
         Initialize a 3D Column with a base point, height, cross-sectional area, and Young's modulus.
         """
-        end = Point3D(base.x, base.y, base.z + height)
+        end = Point3D(base.x, base.y + height, base.z )
         super().__init__(base, end, cross_sectional_area, youngs_modulus)

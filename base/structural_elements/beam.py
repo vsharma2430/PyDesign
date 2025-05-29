@@ -1,4 +1,5 @@
 import math
+from copy import deepcopy
 from base.geometry_base.point import Point3D
 
 class Beam3D:
@@ -55,9 +56,13 @@ class Beam3D:
         """
         Shift start and end point by point
         """
-        self.start = self.start.__add__(point)
-        self.end = self.end.__add__(point)
-        return self
+        beam = deepcopy(self)
+        beam.start = self.start.__add__(point)
+        beam.end = self.end.__add__(point)
+        return beam
+    
+    def mid(self):
+        return self.start.mid(self.end)
 
     def __str__(self):
         """
@@ -76,3 +81,15 @@ class Beam3D:
                 # f"cross_sectional_area={self.cross_sectional_area}, "
                 # f"youngs_modulus={self.youngs_modulus})"
                 )
+        
+beams_sorted_yzx = lambda beams : sorted(beams, key=lambda beam: (beam.start.y, beam.start.z, beam.start.x))
+beams_sorted_yxz = lambda beams : sorted(beams, key=lambda beam: (beam.start.y, beam.start.x, beam.start.z))
+
+def group_beams_by_y(beams):
+    groups = {}
+    for beam in beams:
+        y = beam.start.y
+        if y not in groups:
+            groups[y] = []
+        groups[y].append(beam)
+    return groups

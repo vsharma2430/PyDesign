@@ -41,6 +41,9 @@ class Point3D:
             self.x = tuple_pt[0]
             self.y = tuple_pt[1]
             self.z = tuple_pt[2]
+            
+    def __round__(self, other,n_digits=3):
+        return Point3D(round(self.x,ndigits=n_digits),round(self.y,ndigits=n_digits),round(self.z,ndigits=n_digits))
 
     def distance_to(self, other,n_digits=3):
         """
@@ -65,6 +68,12 @@ class Point3D:
         Add two Point3D objects together.
         """
         return Point3D(self.x + other.x, self.y + other.y, self.z + other.z)
+    
+    def mid(self, other):
+        """
+        Mid of two Point3D objects.
+        """
+        return Point3D((self.x + other.x)/2, (self.y + other.y)/2, (self.z + other.z)/2)
 
     def __sub__(self, other):
         """
@@ -77,3 +86,21 @@ class Point3D:
         Check if two Point3D objects are equal.
         """
         return self.x == other.x and self.y == other.y and self.z == other.z
+    
+    def eq_x(self, other):
+        """
+        Check if two Point3D objects are equal x.
+        """
+        return self.x == other.x
+    
+    def eq_y(self, other):
+        """
+        Check if two Point3D objects are equal.
+        """
+        return self.y == other.y
+    
+    def eq_z(self, other):
+        """
+        Check if two Point3D objects are equal.
+        """
+        return self.z == other.z

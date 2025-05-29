@@ -29,7 +29,7 @@ def get_node_incidence(geometry,nodeNo) -> float:
     y,yptr = get_ctype_double()
     z,zptr = get_ctype_double()
     geometry.GetNodeIncidence(int(nodeNo),xptr,yptr,zptr)
-    return round(x.value,point_precision),round(y.value,point_precision),round(z.value,point_precision)
+    return Point3D(round(x.value,point_precision),round(y.value,point_precision),round(z.value,point_precision))
 
 def get_node_incidences(geometry) -> dict:
     result = {}
@@ -98,5 +98,21 @@ def get_beam_objects(geometry,property=None,nodes=None) -> dict:
         if(property):
             profile = get_beam_property_name(property=property,beam_no=beamNo)
 
-        result[beamNo] = Beam3D(start=Point3D(tuple_pt=nodes[beam_incidence[0]]),end=Point3D(tuple_pt=nodes[beam_incidence[1]]),profile=profile)
+        result[beamNo] = Beam3D(start=nodes[beam_incidence[0]],end=nodes[beam_incidence[1]],profile=profile)
     return result
+
+def add_node(geometry,point:Point3D):
+    if(point is not None):
+        point = round(point,3)
+        return geometry.AddNode(point.x,point.y,point.z)
+    return None
+
+def add_beam(geometry,beam:Beam3D):
+    if(beam is not None and beam.start is not None and beam.end is not None):
+        beam_start=round(beam.start,3)
+        beam_end=round(beam.end,3)
+        return geometry.AddBeam(add_node(geometry=geometry,point=beam_start),add_node(geometry=geometry,point=beam_end))
+    return None
+
+add_beams = lambda geometry : lambda beams : list(map(lambda beam: add_beam(geometry=geometry, beam=beam), [*beams]))
+    
