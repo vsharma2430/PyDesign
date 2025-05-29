@@ -6,6 +6,9 @@ def get_section_property_count(property):
 def get_section_name(property,property_no):
     return property.GetSectionPropertyName(property_no)
 
+def get_beam_property_name(property,beam_no):
+    return property.GetBeamSectionDisplayName(beam_no)
+
 def get_property_id(property,beam_no):
     return property.GetBeamSectionPropertyRefNo(beam_no)
     

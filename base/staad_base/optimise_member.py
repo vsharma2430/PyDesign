@@ -1,4 +1,5 @@
 import statistics
+from collections import Counter
 from typing import Dict, List, Any
 from base.staad_base.property import *
 from base.staad_base.root import *
@@ -64,14 +65,24 @@ class member_group:
         else:
             self.members = []
 
-        self.members = unique_list(members) if members is not None else []
         self.profiles = unique_list(profiles) if profiles is not None else []
-        self.preference = preference if preference is not None else get_property_id(self.property,self.members[0])
-        self.allowable_ratio = allowable_ratio
 
+        # Get property_id for each member and find the one with highest occurrences
+        if self.members:
+            property_ids = [get_property_id(self.property, member) for member in self.members]
+            most_common = Counter(property_ids).most_common(1)
+            self.preference = most_common[0][0] if most_common else get_property_id(self.property, self.members[0])
+
+            property_names = [get_beam_property_name(self.property, member) for member in self.members]
+            most_common = Counter(property_names).most_common(1)
+            self.profile_name =  most_common[0][0] if most_common else get_beam_property_name(self.property, self.members[0])
+        else:
+            self.profile_name = None
+
+        self.allowable_ratio = allowable_ratio
         self.results = {}
 
-        print(f'Created member group "{self.id}" , property {self.preference} with {len(self.members)} members -> {self.members}')
+        # print(f'Created member group "{self.id}" , property {self.preference} with {len(self.members)} members -> {self.members}')
         
     def set_members_property(self,index):
         if(index > -1 and index < len(self.profiles)):
@@ -80,6 +91,7 @@ class member_group:
             print(f'Assignment of {self.profiles[index]} to {self.members}')
 
     def set_members_property_initial(self):
+        result = []
         if(self.preference is not None):
             for member in self.members:
                 result = assign_beam_property(self.property,beam_no=member,property_no=self.preference)

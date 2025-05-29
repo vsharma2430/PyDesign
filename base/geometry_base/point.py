@@ -28,7 +28,7 @@ class Point:
         return f"Point(x={self.x}, y={self.y})"
     
 class Point3D:
-    def __init__(self, x=0, y=0, z=0):
+    def __init__(self, x=0, y=0, z=0,tuple_pt=None):
         """
         Initialize a 3D Point with x, y, and z coordinates.
         Default coordinates are (0, 0, 0).
@@ -37,17 +37,22 @@ class Point3D:
         self.y = y
         self.z = z
 
-    def distance_to(self, other):
+        if(tuple_pt):
+            self.x = tuple_pt[0]
+            self.y = tuple_pt[1]
+            self.z = tuple_pt[2]
+
+    def distance_to(self, other,n_digits=3):
         """
         Calculate the Euclidean distance between this point and another 3D point.
         """
-        return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2 + (self.z - other.z)**2)
+        return round(math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2 + (self.z - other.z)**2),ndigits=n_digits)
 
     def __str__(self):
         """
         Return a string representation of the 3D Point.
         """
-        return f"Point3D(x={self.x}, y={self.y}, z={self.z})"
+        return f"{self.x} , {self.y} , {self.z}"
 
     def __repr__(self):
         """

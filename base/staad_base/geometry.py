@@ -1,4 +1,7 @@
 from base.staad_base.com_array import *
+from base.geometry_base.point import *
+from base.structural_elements.beam import *
+from base.staad_base.property import *
 
 point_precision = 3
 
@@ -10,22 +13,7 @@ def get_selected_beam_count(geometry) -> int:
     nodeCount = geometry.GetNoOfSelectedBeams()
     return nodeCount
 
-def get_node_incidence(geometry,nodeNo) -> float:
-    x,xptr = get_ctype_double()
-    y,yptr = get_ctype_double()
-    z,zptr = get_ctype_double()
-    geometry.GetNodeIncidence(int(nodeNo),xptr,yptr,zptr)
-    return round(x.value,point_precision),round(y.value,point_precision),round(z.value,point_precision)
-
-def get_node_incidences(geometry) -> float:
-    result = []
-    node_nos = get_node_nos(geometry=geometry)
-    for nodeNo in node_nos:
-        node_incidence = get_node_incidence(geometry=geometry,nodeNo=nodeNo[1])
-        result.append((nodeNo,node_incidence))
-    return result
-
-def get_node_nos(geometry,tuple:bool=True) -> list:
+def get_node_nos(geometry) -> list:
     beamCount = get_node_count(geometry=geometry)
     safe_array_beam_list = make_safe_array_long(beamCount)
     nodes = make_variant_vt_ref(safe_array_beam_list, automation.VT_ARRAY | automation.VT_I4) # signed 32 bit integer
@@ -33,11 +21,24 @@ def get_node_nos(geometry,tuple:bool=True) -> list:
     nodes = nodes[0]
     result = []
     for node in enumerate(nodes):
-        if(tuple):
-            result.append((node[0],node[1]))
-        else:
-            result.append({'id':node[0],'no':node[1]})
+        result.append(node[1])
     return result
+
+def get_node_incidence(geometry,nodeNo) -> float:
+    x,xptr = get_ctype_double()
+    y,yptr = get_ctype_double()
+    z,zptr = get_ctype_double()
+    geometry.GetNodeIncidence(int(nodeNo),xptr,yptr,zptr)
+    return round(x.value,point_precision),round(y.value,point_precision),round(z.value,point_precision)
+
+def get_node_incidences(geometry) -> dict:
+    result = {}
+    node_nos = get_node_nos(geometry=geometry)
+    for nodeNo in node_nos:
+        node_incidence = get_node_incidence(geometry=geometry,nodeNo=nodeNo)
+        result[nodeNo] = node_incidence
+    return result
+
 
 def get_beam_count(geometry) -> int:
     beamCount = geometry.GetMemberCount()
@@ -85,10 +86,17 @@ def get_selected_beam_nos(geometry,sort:int=1,tuple:bool = False) -> list:
             result.append(beam[1])
     return result
 
-def get_beam_incidences(geometry) -> float:
-    result = []
+def get_beam_objects(geometry,property=None,nodes=None) -> dict:
+    if(nodes is None):
+        nodes = get_node_incidences(geometry=geometry)
+
+    result = {}
     beam_nos = get_beam_nos(geometry=geometry)
     for beamNo in beam_nos:
-        beam_incidence = get_beam_incidence(geometry=geometry,beamNo=beamNo[1])
-        result.append((beamNo,beam_incidence))
+        beam_incidence = get_beam_incidence(geometry=geometry,beamNo=beamNo)
+        profile = ''
+        if(property):
+            profile = get_beam_property_name(property=property,beam_no=beamNo)
+
+        result[beamNo] = Beam3D(start=Point3D(tuple_pt=nodes[beam_incidence[0]]),end=Point3D(tuple_pt=nodes[beam_incidence[1]]),profile=profile)
     return result

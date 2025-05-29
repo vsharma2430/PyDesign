@@ -73,5 +73,6 @@ class Beam3D:
         """
         return (f"Beam(start={self.start}, end={self.end}, "
                 f"Profile={self.profile}, "
-                f"cross_sectional_area={self.cross_sectional_area}, "
-                f"youngs_modulus={self.youngs_modulus})")
+                # f"cross_sectional_area={self.cross_sectional_area}, "
+                # f"youngs_modulus={self.youngs_modulus})"
+                )
