@@ -68,19 +68,14 @@ class Beam3D:
         """
         Return a string representation of the 3D Beam.
         """
-        return (f"Beam(start={self.start}, end={self.end}, "
-                f"cross_sectional_area={self.cross_sectional_area}, "
-                f"youngs_modulus={self.youngs_modulus})")
+        return (f"Beam(start={self.start}, end={self.end},")
 
     def __repr__(self):
         """
         Return a formal string representation of the 3D Beam.
         """
         return (f"Beam(start={self.start}, end={self.end}, "
-                f"Profile={self.profile}, "
-                # f"cross_sectional_area={self.cross_sectional_area}, "
-                # f"youngs_modulus={self.youngs_modulus})"
-                )
+                f"Profile={self.profile}, ")
         
 beams_sorted_yzx = lambda beams : sorted(beams, key=lambda beam: (beam.start.y, beam.start.z, beam.start.x))
 beams_sorted_yxz = lambda beams : sorted(beams, key=lambda beam: (beam.start.y, beam.start.x, beam.start.z))

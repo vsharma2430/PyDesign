@@ -1,0 +1,1 @@
+avg = lambda items : sum(items)/len(items)
