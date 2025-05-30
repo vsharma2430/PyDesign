@@ -42,7 +42,7 @@ class Point3D:
             self.y = tuple_pt[1]
             self.z = tuple_pt[2]
             
-    def __round__(self, other,n_digits=3):
+    def __round__(self, n_digits=3):
         return Point3D(round(self.x,ndigits=n_digits),round(self.y,ndigits=n_digits),round(self.z,ndigits=n_digits))
 
     def distance_to(self, other,n_digits=3):

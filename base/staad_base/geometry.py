@@ -103,14 +103,14 @@ def get_beam_objects(geometry,property=None,nodes=None) -> dict:
 
 def add_node(geometry,point:Point3D):
     if(point is not None):
-        point = round(point,3)
+        point = round(point)
         return geometry.AddNode(point.x,point.y,point.z)
     return None
 
 def add_beam(geometry,beam:Beam3D):
     if(beam is not None and beam.start is not None and beam.end is not None):
-        beam_start=round(beam.start,3)
-        beam_end=round(beam.end,3)
+        beam_start=round(beam.start)
+        beam_end=round(beam.end)
         return geometry.AddBeam(add_node(geometry=geometry,point=beam_start),add_node(geometry=geometry,point=beam_end))
     return None
 

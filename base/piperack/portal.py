@@ -11,6 +11,7 @@ class PiperackPortal:
         self.base = base
         self.beams = []
         self.columns = []
+        self.pedestals = []
         self.walkways = []
         self.ducts = []
         self.trees = []
@@ -31,7 +32,15 @@ class PiperackPortal:
         if type(column) is Column3D:
             self.columns.append(column.shift(point=self.base))
         return self
-
+    
+    def add_pedestal(self, column: Column3D):
+        """
+        Add a column to the piperack portal.
+        """
+        if type(column) is Column3D:
+            self.pedestals.append(column.shift(point=self.base))
+        return self
+    
     def total_length_of_members(self):
         """
         Calculate the total length of all beams and columns in the piperack portal.
@@ -49,6 +58,7 @@ class PiperackPortal:
         new_portal.base = self.base.__add__(point)
         new_portal.beams = []
         new_portal.columns = []
+        new_portal.pedestals = []
         beam:Beam3D
         for beam in self.beams:
             new_portal.beams.append(beam.shift(point))
@@ -56,6 +66,10 @@ class PiperackPortal:
         column:Column3D
         for column in self.columns:
             new_portal.columns.append(column.shift(point))
+        
+        pedestal:Column3D
+        for pedestal in self.pedestals:
+            new_portal.pedestals.append(pedestal.shift(point))
 
         return new_portal
 

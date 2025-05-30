@@ -61,6 +61,11 @@ class Beam3D:
         beam.end = self.end.__add__(point)
         return beam
     
+    def shift_to_y(self,y):
+        self.start.y = y
+        self.end.y = y
+        return self
+        
     def mid(self):
         return self.start.mid(self.end)
 
