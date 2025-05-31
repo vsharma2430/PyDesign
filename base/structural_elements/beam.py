@@ -1,8 +1,9 @@
 import math
 from copy import deepcopy
+from base.structural_elements.member import Member
 from base.geometry_base.point import Point3D
 
-class Beam3D:
+class Beam3D(Member):
     def __init__(self, start: Point3D = Point3D(), end: Point3D = Point3D(1,0,0), 
                 profile:str = '', cross_sectional_area: float = 0.0, youngs_modulus: float = 210e9,weight_per_meter : float = 0):
         """

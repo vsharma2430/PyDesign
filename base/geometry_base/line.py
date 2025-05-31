@@ -1,7 +1,8 @@
 import math
+from base.geometry_base.shape import Shape
 from point import Point,Point3D
 
-class Line:
+class Line(Shape):
     def __init__(self, start: Point, end: Point):
         """
         Initialize a Line with a start point and an end point.
@@ -36,7 +37,7 @@ class Line:
         """
         return f"Line(start={self.start}, end={self.end})"
     
-class Line3D:
+class Line3D(Shape):
     def __init__(self, start: Point3D, end: Point3D):
         """
         Initialize a 3D Line with a start point and an end point.

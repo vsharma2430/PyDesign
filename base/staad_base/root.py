@@ -134,6 +134,8 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     property._FlagAsMethod('GetBeamSectionPropertyRefNo	')
     property._FlagAsMethod('CreateAssignProfileProperty')
     property._FlagAsMethod('CreateBeamPropertyFromTable')
+    property._FlagAsMethod('CreatePrismaticCircleProperty')
+    property._FlagAsMethod('CreatePrismaticRectangleProperty')
     
     property._FlagAsMethod('CreateMemberReleaseSpec')
     property._FlagAsMethod('CreateMemberTrussSpec')

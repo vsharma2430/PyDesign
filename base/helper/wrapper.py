@@ -35,7 +35,7 @@ def print(func):
         return result 
     return wrap 
 
-def memoize_profile_creation(func):
+def memoize_steel_profile_creation(func):
     cache = {}
     def memoized(*args):
         # Convert args to a cache key (assuming profile is the second argument)
@@ -45,3 +45,14 @@ def memoize_profile_creation(func):
         return cache[key]
     return memoized
 
+def memoize_concrete_profile_creation(func):
+    cache = {}
+    
+    def memoized(*args):
+        # Create a cache key based on the string representation of arguments
+        key = (str(args[0]), str(args[1]))
+        if key not in cache:
+            cache[key] = func(*args)
+        return cache[key]
+    
+    return memoized
