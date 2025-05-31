@@ -97,6 +97,17 @@ class LoadItemNo(IntEnum):
     RepeatLoad = 4200
     NotionalLoad = 4222
 
+class MemberDirection(IntEnum):
+    X = 1
+    Y = 2
+    Z = 3
+    GX = 4
+    GY = 5
+    GZ = 6
+    PX = 7
+    PY = 7
+    PZ = 8
+    
 def get_load_count(load) -> int:
     loadCount = load.GetPrimaryLoadCaseCount()
     return loadCount 
@@ -202,3 +213,9 @@ def get_member_load_info(load,load_case,load_index_no:int) -> list:
     distances = distances[0]
 
     return {'direction':direction.value,'forces':list(map(convert_kn_to_mt,open_array(forces))),'distances':open_array(distances)}
+
+def add_member_force(load,BeamNo:int, Direction:MemberDirection=MemberDirection.Y, ForceValue:float=-1, D1Value:float=0, D2Value :float=0):
+    return load.AddMemberConcForce(BeamNo,Direction,ForceValue,D1Value,D2Value)
+
+add_conc_forces_to_members = lambda load : lambda beams, Direction, ForceValue, D1Value, D2Value : list(map(lambda beam: add_member_force(load,beam,Direction,ForceValue,D1Value,D2Value), [*beams]))
+    
