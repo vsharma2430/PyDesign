@@ -57,3 +57,7 @@ def create_spec_markdown_table(start_release_spec,end_release_spec,truss_spec,of
     markdown_output += f"| Truss | {truss_spec} |\n"
     markdown_output += f"| Offset Member | {offset_member_spec} |\n"
     return markdown_output
+
+def create_primary_member_markdown_table():
+
+    return markdown_output
