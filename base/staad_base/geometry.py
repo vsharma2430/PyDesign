@@ -101,10 +101,18 @@ def get_beam_objects(geometry,property=None,nodes=None) -> dict:
         result[beamNo] = Beam3D(start=nodes[beam_incidence[0]],end=nodes[beam_incidence[1]],profile=profile)
     return result
 
-def add_node(geometry,point:Point3D):
+def add_node(geometry,point:Point3D) -> int:
     if(point is not None):
         point = round(point)
         return geometry.AddNode(point.x,point.y,point.z)
+    return None
+
+def add_support_node(geometry,support,point:Point3D,support_id:int) -> int:
+    if(point is not None):
+        support_node = get_node_number(geometry=geometry,point=point)
+        support.AssignSupportToNode(support_node,support_id)
+        return support_node
+
     return None
 
 def add_beam(geometry,beam:Beam3D):
@@ -114,5 +122,10 @@ def add_beam(geometry,beam:Beam3D):
         return geometry.AddBeam(add_node(geometry=geometry,point=beam_start),add_node(geometry=geometry,point=beam_end))
     return None
 
+def get_node_number(geometry,point:Point3D):
+    if geometry and point:
+        point.__round__()
+        return geometry.GetNodeNumber(point.x,point.y,point.z)
+    return None
+
 add_beams = lambda geometry : lambda beams : list(map(lambda beam: add_beam(geometry=geometry, beam=beam), [*beams]))
-    

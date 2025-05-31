@@ -24,13 +24,14 @@ ANALYSIS_STATUS_MESSAGES = {
 }
 
 class OpenSTAAD_objects:
-    def __init__(self, geometry=None, output=None, load=None, property=None, design=None):
+    def __init__(self, geometry=None, output=None, load=None, property=None, design=None,support=None):
         self.geometry = geometry if geometry is not None else {}
         self.output = output if output is not None else {}
         self.load = load if load is not None else {}
         self.property = property if property is not None else {}
         self.design = design if design is not None else {}
-
+        self.support = support if support is not None else {}
+        
 def get_openSTAAD() -> OpenSTAAD_objects:
     os = client.GetActiveObject("StaadPro.OpenSTAAD")
 
@@ -39,6 +40,7 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     property = os.Property
     load = os.Load
     design = os.Design
+    support = os.Support
 
     os._FlagAsMethod("Analyze")
     os._FlagAsMethod("AnalyzeEx")
@@ -96,6 +98,14 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     geometry._FlagAsMethod("GetNoOfSelectedBeams") 
     geometry._FlagAsMethod("GetSelectedBeams") 
     geometry._FlagAsMethod("RenumberBeam") 
+    
+    #support
+    support._FlagAsMethod("AssignSupportToNode")
+    support._FlagAsMethod("CreateSupportFixed")
+    support._FlagAsMethod("CreateSupportPinned")
+    support._FlagAsMethod("GetSupportCount")
+    support._FlagAsMethod("GetSupportNodes")
+    support._FlagAsMethod("GetSupportType")
 
     #groups
     geometry._FlagAsMethod("GetGroupCountAll") 
@@ -123,6 +133,12 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     property._FlagAsMethod('AssignBeamProperty')
     property._FlagAsMethod('GetBeamSectionPropertyRefNo	')
     property._FlagAsMethod('CreateAssignProfileProperty')
+    property._FlagAsMethod('CreateBeamPropertyFromTable')
+    
+    property._FlagAsMethod('CreateMemberReleaseSpec')
+    property._FlagAsMethod('CreateMemberTrussSpec')
+    property._FlagAsMethod('CreateMemberOffsetSpec')
+    property._FlagAsMethod('AssignMemberSpecToBeam')
 
     #loads
     load._FlagAsMethod("GetPrimaryLoadCaseCount")
@@ -235,7 +251,7 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     output._FlagAsMethod("GetSteelDesignParameterBlockNameByIndex")
     output._FlagAsMethod("IsMultipleMemberSteelDesignResultsAvailable")
 
-    return os,OpenSTAAD_objects(geometry=geometry,output=output,load=load,property=property,design=design)
+    return os,OpenSTAAD_objects(geometry=geometry,output=output,load=load,property=property,design=design,support=support)
 
 def run_analysis(openSTAAD,silent=1,hidden=0,wait=0,wait_interval=5):
     openSTAAD.SetSilentMode(1)

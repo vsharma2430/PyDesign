@@ -35,4 +35,13 @@ def print(func):
         return result 
     return wrap 
 
+def memoize_profile_creation(func):
+    cache = {}
+    def memoized(*args):
+        # Convert args to a cache key (assuming profile is the second argument)
+        key = (args[0], str(args[1]), args[2], args[3], args[4])  # Convert profile to string if needed
+        if key not in cache:
+            cache[key] = func(*args)
+        return cache[key]
+    return memoized
 
