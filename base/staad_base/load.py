@@ -217,5 +217,11 @@ def get_member_load_info(load,load_case,load_index_no:int) -> list:
 def add_member_force(load,BeamNo:int, Direction:MemberDirection=MemberDirection.Y, ForceValue:float=-1, D1Value:float=0, D2Value :float=0):
     return load.AddMemberConcForce(BeamNo,Direction,ForceValue,D1Value,D2Value)
 
+def add_member_moment(load,BeamNo:int, Direction:MemberDirection=MemberDirection.Y, MomentValue:float=-1, D1Value:float=0, D2Value :float=0):
+    return load.AddMemberConcMoment(BeamNo,Direction,MomentValue,D1Value,D2Value)
+
+def add_member_uniform_force(load,BeamNo:int, Direction:MemberDirection=MemberDirection.Y, ForceValue:float=-1, D1Value:float=0, D2Value :float=0, D3Value :float=0):
+    return load.AddMemberUniformForce(BeamNo,Direction,ForceValue,D1Value,D2Value,D3Value)
+
 add_conc_forces_to_members = lambda load : lambda beams, Direction, ForceValue, D1Value, D2Value : list(map(lambda beam: add_member_force(load,beam,Direction,ForceValue,D1Value,D2Value), [*beams]))
-    
+add_uniform_forces_to_members = lambda load : lambda beams, Direction, ForceValue, D1Value, D2Value , D3Value : list(map(lambda beam: add_member_uniform_force(load,beam,Direction,ForceValue,D1Value,D2Value,D3Value), [*beams]))

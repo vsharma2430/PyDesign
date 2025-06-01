@@ -86,7 +86,7 @@ def get_selected_beam_nos(geometry,sort:int=1,tuple:bool = False) -> list:
             result.append(beam[1])
     return result
 
-def get_beam_objects(geometry,property=None,nodes=None) -> dict:
+def get_beam_objects(geometry,property=None,nodes=None) -> dict[int,Beam3D]:
     if(nodes is None):
         nodes = get_node_incidences(geometry=geometry)
 
