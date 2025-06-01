@@ -1,112 +1,15 @@
-from enum import IntEnum
+from functools import lru_cache
 from base.staad_base.com_array import *
 from base.staad_base.helper import *
+from base.staad_base.load_enum import *
+from base.load.conc_load import *
+from base.load.conc_moment import *
+from base.load.uniform_load import *
+from base.load.uniform_moment import *
+from base.structural_elements.beam import *
 
 open_array = lambda array,index=1 : [x[index] for x in enumerate(array)]
 
-class LoadType(IntEnum):
-    Dead = 0
-    Live = 1
-    RoofLive = 2
-    Wind = 3
-    SeismicH = 4
-    SeismicV = 5
-    Snow = 6
-    Fluids = 7
-    Soil = 8
-    Rain = 9
-    Ponding = 10
-    Dust = 11
-    Traffic = 12
-    Temp = 13
-    Imperfection = 14
-    Accidental = 15
-    Flood = 16
-    Ice = 17
-    WindIce = 18
-    CraneHook = 19
-    Mass = 20
-    Gravity = 21
-    Push = 22
-    NoneType = 23  # 'None' is a reserved keyword in Python
-
-class LoadItemNo(IntEnum):
-    SelfWeight = 4000
-    NodalLoad_Node = 3110
-    NodalLoad_Inclined = 3120
-    NodalLoad_SupportDisplacement = 3910
-    NodalLoad_RegionNodeLoad = 3312
-    UniformForce = 3210
-    UniformMoment = 3220
-    ConcentratedForce = 3230
-    ConcentratedMoment = 3240
-    LinearVarying = 3250
-    Trapezoidal = 3260
-    Hydrostatic = 3261
-    PrePostStress = 3620
-    FixedEnd = 3810
-    UniformForce_Physical = 3275
-    UniformMoment_Physical = 3280
-    ConcentratedForce_Physical = 3285
-    ConcentratedMoment_Physical = 3290
-    Trapezoidal_Physical = 3295
-    Area = 3410
-    FloorLoadYrange = 3510
-    FloorLoadXrange = 3511
-    FloorLoadZrange = 3520
-    FloorLoadGroup = 3530
-    OneWayFloorLoadXrange = 3551
-    OneWayFloorLoadYrange = 3552
-    OneWayFloorLoadZrange = 3553
-    OneWayFloorLoadGroup = 3554
-    PressureFullPlate = 3310
-    ConcentratedLoad_Plate = 3311
-    PartialPlatePressure = 3312
-    Trapezoidal_Plate = 3320
-    Solid = 3322
-    Temperature = 3710
-    Strain = 3720
-    StrainRate = 3721
-    UBCLoad = 4400
-    WindLoad = 4600
-    WindLoadDynamic = 4610
-    IbcLoad = 4405
-    Load1893 = 4410
-    AijLoad = 4500
-    ColombianLoad = 4510
-    CFELoad = 4520
-    RPALoad = 4530
-    NTCLoad = 4540
-    NRCLoad = 4550
-    NRCLoad2005 = 4560
-    NRCLoad2010 = 4561
-    TurkishLoad = 4570
-    GB50011Load = 4575
-    Colombian2010Load = 4576
-    TimeHistoryLoad = 4820
-    SnowLoadData = 4651
-    RepeatLoadData = 4201
-    NotionalLoadData = 4223
-    ReferenceLoad = 4220
-    SpectrumLoad = 4100
-    SpectrumData = 4101
-    CalculateNaturalFrequency = 4700
-    ModalCalculationRequested = 4710
-    CalculateRayleighFrequency = 4701
-    SnowLoad = 4650
-    RepeatLoad = 4200
-    NotionalLoad = 4222
-
-class MemberDirection(IntEnum):
-    X = 1
-    Y = 2
-    Z = 3
-    GX = 4
-    GY = 5
-    GZ = 6
-    PX = 7
-    PY = 7
-    PZ = 8
     
 def get_load_count(load) -> int:
     loadCount = load.GetPrimaryLoadCaseCount()
@@ -214,14 +117,11 @@ def get_member_load_info(load,load_case,load_index_no:int) -> list:
 
     return {'direction':direction.value,'forces':list(map(convert_kn_to_mt,open_array(forces))),'distances':open_array(distances)}
 
-def add_member_force(load,BeamNo:int, Direction:MemberDirection=MemberDirection.Y, ForceValue:float=-1, D1Value:float=0, D2Value :float=0):
-    return load.AddMemberConcForce(BeamNo,Direction,ForceValue,D1Value,D2Value)
+def add_member_force(load,BeamNo:int, load_object : ConcentratedLoad):
+    return load.AddMemberConcForce(BeamNo,load_object.direction,load_object.force_value,load_object.d1_value,load_object.d2_value)
 
-def add_member_moment(load,BeamNo:int, Direction:MemberDirection=MemberDirection.Y, MomentValue:float=-1, D1Value:float=0, D2Value :float=0):
-    return load.AddMemberConcMoment(BeamNo,Direction,MomentValue,D1Value,D2Value)
+def add_member_uniform_force(load,BeamNo:int, load_object : UniformLoad):
+    return load.AddMemberUniformForce(BeamNo,load_object.direction,load_object.force_value,load_object.d1_value,load_object.d2_value,load_object.d3_value)
 
-def add_member_uniform_force(load,BeamNo:int, Direction:MemberDirection=MemberDirection.Y, ForceValue:float=-1, D1Value:float=0, D2Value :float=0, D3Value :float=0):
-    return load.AddMemberUniformForce(BeamNo,Direction,ForceValue,D1Value,D2Value,D3Value)
-
-add_conc_forces_to_members = lambda load : lambda beams, Direction, ForceValue, D1Value, D2Value : list(map(lambda beam: add_member_force(load,beam,Direction,ForceValue,D1Value,D2Value), [*beams]))
-add_uniform_forces_to_members = lambda load : lambda beams, Direction, ForceValue, D1Value, D2Value , D3Value : list(map(lambda beam: add_member_uniform_force(load,beam,Direction,ForceValue,D1Value,D2Value,D3Value), [*beams]))
+add_conc_forces_to_members_fn = lambda load : lambda beams, load_object : list(map(lambda beam: add_member_force(load,beam.id if isinstance(beam,Beam3D) else beam,load_object), [*beams]))
+add_uniform_forces_to_members_fn = lambda load : lambda beams, load_object : list(map(lambda beam: add_member_uniform_force(load,beam.id if isinstance(beam,Beam3D) else beam,load_object), [*beams]))

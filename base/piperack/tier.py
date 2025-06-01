@@ -51,9 +51,10 @@ class Tier:
         Raises:
             TypeError: If any beam is not a Beam3D object.
         """
-        for beam in self.beams:
-            if not isinstance(beam, Beam3D):
-                raise TypeError(f"All beams must be Beam3D objects, found {type(beam)}.")
+        if(self.beams):
+            for beam in self.beams:
+                if not isinstance(beam, Beam3D):
+                    raise TypeError(f"All beams must be Beam3D objects, found {type(beam)}.")
 
     def _validate_loads(self) -> None:
         """Validate that all loads are Load objects.
@@ -61,9 +62,10 @@ class Tier:
         Raises:
             TypeError: If any load is not a Load object.
         """
-        for load in self.loads:
-            if not isinstance(load, Load):
-                raise TypeError(f"All loads must be Load objects, found {type(load)}.")
+        if(self.loads):
+            for load in self.loads:
+                if not isinstance(load, Load):
+                    raise TypeError(f"All loads must be Load objects, found {type(load)}.")
 
     def add_beam(self, beam: Beam3D) -> None:
         """Add a single Beam3D to the tier.

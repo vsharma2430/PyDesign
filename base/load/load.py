@@ -6,7 +6,6 @@ class LoadCase(IntEnum):
     EmptyLoad = 301
 
 class Load:
-    def __init__(self,load_case:LoadCase=101,members:list[Member]=None):
+    def __init__(self,load_case:LoadCase=101):
         self.load_case = load_case
-        self.member = []
         pass

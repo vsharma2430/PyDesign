@@ -98,7 +98,7 @@ def get_beam_objects(geometry,property=None,nodes=None) -> dict[int,Beam3D]:
         if(property):
             profile = get_beam_property_name(property=property,beam_no=beamNo)
 
-        result[beamNo] = Beam3D(start=nodes[beam_incidence[0]],end=nodes[beam_incidence[1]],profile=profile)
+        result[beamNo] = Beam3D(id=beamNo,start=nodes[beam_incidence[0]],end=nodes[beam_incidence[1]],profile=profile)
     return result
 
 def add_node(geometry,point:Point3D) -> int:
@@ -129,3 +129,4 @@ def get_node_number(geometry,point:Point3D):
     return None
 
 add_beams = lambda geometry : lambda beams : list(map(lambda beam: add_beam(geometry=geometry, beam=beam), [*beams]))
+select_beams_fn = lambda geometry : lambda beams : list(map(lambda beam: select_beam(geometry=geometry, beamNo=beam), [*beams]))

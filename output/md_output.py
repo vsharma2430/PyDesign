@@ -58,6 +58,37 @@ def create_spec_markdown_table(start_release_spec,end_release_spec,truss_spec,of
     markdown_output += f"| Offset Member | {offset_member_spec} |\n"
     return markdown_output
 
-def create_primary_member_markdown_table():
+def create_tiers_markdown_table(tiers, title="Tier List"):
+    markdown = "# Tier List\n\n"
+    markdown += "| Tier Number | Elevation (y) | Load Type |\n"
+    markdown += "|-------------|---------------|-----------|\n"
+    
+    # Iterate through tiers and add to markdown table
+    for i, tier in enumerate(tiers, 1):
+        elevation = tier.base.y
+        load_types = ", ".join(str(load) for load in tier.loads) if tier.loads else "None"
+        markdown += f"| Tier {i} | {elevation} | {load_types} |\n"
+    
+    return markdown
 
-    return markdown_output
+def create_beams_markdown_table(beams):
+    """
+    Convert a list of Beam3D objects to a Markdown table with start, end, and profile.
+    
+    Args:
+        beams (list): List of Beam3D objects.
+        
+    Returns:
+        str: Markdown table string containing beam start, end, and profile.
+    """
+    # Header for the Markdown table
+    markdown = "| ID | Start (x,y,z) | End (x,y,z) | Profile |\n"
+    markdown += "|----|---------------|-------------|---------|\n"
+    
+    # Iterate through beams with an index as ID
+    for idx, beam in enumerate(beams, 1):
+        start = f"({beam.start.x:.2f}, {beam.start.y:.2f}, {beam.start.z:.2f})"
+        end = f"({beam.end.x:.2f}, {beam.end.y:.2f}, {beam.end.z:.2f})"
+        markdown += f"| {idx} | {start} | {end} | {beam.profile} |\n"
+    
+    return markdown

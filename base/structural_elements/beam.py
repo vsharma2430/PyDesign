@@ -4,11 +4,12 @@ from base.structural_elements.member import Member
 from base.geometry_base.point import Point3D
 
 class Beam3D(Member):
-    def __init__(self, start: Point3D = Point3D(), end: Point3D = Point3D(1,0,0), 
+    def __init__(self,start: Point3D = Point3D(), end: Point3D = Point3D(1,0,0), id:int =-1, 
                 profile:str = '', cross_sectional_area: float = 0.0, youngs_modulus: float = 210e9,weight_per_meter : float = 0):
         """
         Initialize a 3D Beam with start and end points, cross-sectional area, and Young's modulus.
         """
+        self.id = id
         self.start = start
         self.end = end
         self.profile = profile

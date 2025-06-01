@@ -91,16 +91,25 @@ class Point3D:
         """
         Check if two Point3D objects are equal x.
         """
-        return self.x == other.x
+        if(isinstance(other,Point3D)):
+            return self.x == other.x
+        else:
+            return self.x == other
     
     def eq_y(self, other):
         """
         Check if two Point3D objects are equal.
         """
-        return self.y == other.y
+        if(isinstance(other,Point3D)):
+            return self.y == other.y
+        else:
+            return self.y == other
     
     def eq_z(self, other):
         """
         Check if two Point3D objects are equal.
         """
-        return self.z == other.z
+        if(isinstance(other,Point3D)):
+            return self.z == other.z
+        else:
+            return self.z == other
