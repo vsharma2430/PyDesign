@@ -128,5 +128,5 @@ def get_node_number(geometry,point:Point3D):
         return geometry.GetNodeNumber(point.x,point.y,point.z)
     return None
 
-add_beams = lambda geometry : lambda beams : list(map(lambda beam: add_beam(geometry=geometry, beam=beam), [*beams]))
+add_beams_fn = lambda geometry : lambda beams : list(map(lambda beam: add_beam(geometry=geometry, beam=beam), [*beams]))
 select_beams_fn = lambda geometry : lambda beams : list(map(lambda beam: select_beam(geometry=geometry, beamNo=beam), [*beams]))

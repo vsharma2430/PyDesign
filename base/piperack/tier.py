@@ -29,7 +29,8 @@ class Tier:
         loads: Optional[List[Load]] = None,
         clt_loads: Optional[List[Load]] = None,
         material: Material = Material.STEEL,
-        tier_type :TierType = TierType.Piping 
+        tier_type :TierType = TierType.Piping ,
+        intermediate_transverse_beam:bool = True
     ) -> None:
         """Initialize a Tier with a base point, beams, loads, and material.
 
@@ -49,7 +50,12 @@ class Tier:
         self.loads = loads if loads is not None else []
         self.clt_loads = clt_loads if clt_loads is not None else []
         self.tier_type = tier_type 
-
+        
+        if(tier_type != TierType.Piping):
+            self.intermediate_transverse_beam = False
+            
+        self.intermediate_transverse_beam = intermediate_transverse_beam
+        
         # Validate input types
         if not isinstance(base, Point3D):
             raise TypeError("base must be a Point3D object.")
@@ -130,6 +136,10 @@ class Tier:
         if not isinstance(load_obj, Load):
             raise TypeError("load_obj must be a Load object.")
         self.clt_loads.append(load_obj)
+        
+    def set_intermediate_transverse_beam(self,check:bool):
+        self.intermediate_transverse_beam = check
+        return self
 
     def get_beam_count(self) -> int:
         """Return the number of beams in the tier.

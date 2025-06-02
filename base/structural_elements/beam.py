@@ -68,7 +68,7 @@ class Beam3D(Member):
         self.end.y = y
         return self
         
-    def mid(self):
+    def mid(self) -> Point3D:
         return self.start.mid(self.end)
 
     def __str__(self):
