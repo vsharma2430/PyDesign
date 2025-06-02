@@ -1,6 +1,6 @@
 import math
 from base.geometry_base.shape import Shape
-from point import Point,Point3D
+from base.geometry_base.point import Point,Point3D
 
 class Line(Shape):
     def __init__(self, start: Point, end: Point):

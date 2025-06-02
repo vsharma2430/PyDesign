@@ -50,6 +50,18 @@ class Point3D:
         Calculate the Euclidean distance between this point and another 3D point.
         """
         return round(math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2 + (self.z - other.z)**2),ndigits=n_digits)
+    
+    def shift_y(self, y,n_digits=3):
+        """
+        Calculate the Euclidean distance between this point and another 3D point.
+        """
+        return Point3D(round(self.x,ndigits=n_digits),round(y,ndigits=n_digits),round(self.z,ndigits=n_digits))
+    
+    def shift_x(self, x,n_digits=3):
+        """
+        Calculate the Euclidean distance between this point and another 3D point.
+        """
+        return Point3D(round(x,ndigits=n_digits),round(self.y,ndigits=n_digits),round(self.z,ndigits=n_digits))
 
     def __str__(self):
         """
@@ -101,7 +113,7 @@ class Point3D:
         Check if two Point3D objects are equal.
         """
         if(isinstance(other,Point3D)):
-            return self.y == other.y
+            return round(self.y,3) == round(other.y,3)
         else:
             return self.y == other
     

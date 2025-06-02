@@ -107,3 +107,8 @@ class MemberDirection(IntEnum):
 class LoadCase(IntEnum):
     OperatingLoad = 401
     EmptyLoad = 301
+    ThermalGravity_GX = 6
+    ThermalGravity_GZ = 7
+    ThermalLateral_GX = 8
+    ThermalLateral_GZ = 9
+    ContigencyLoadTransverse = 31

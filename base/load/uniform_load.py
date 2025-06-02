@@ -23,10 +23,20 @@ class UniformLoad(Load):
         self.d1_value = d1_value
         self.d2_value = d2_value
         self.d3_value = d3_value
-        
+
+    def set_force_value(self, force_value: float):
+        load = deepcopy(self)
+        load.force_value = force_value
+        return load
+    
     def factor_force_value(self, factor: float):
         load = deepcopy(self)
         load.force_value = self.force_value * factor
+        return load
+    
+    def set_force_direction(self, direction: MemberDirection):
+        load = deepcopy(self)
+        load.direction = direction
         return load
         
     def __str__(self) -> str:

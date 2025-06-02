@@ -29,7 +29,7 @@ class PiperackPortal:
         """
         if not isinstance(base, Point3D):
             raise TypeError("Base must be a Point3D object")
-        self.base = base
+        self.base :Point3D = base
         self.beams: List[Beam3D] = []
         self.columns: List[Column3D] = []
         self.pedestals: List[Column3D] = []
