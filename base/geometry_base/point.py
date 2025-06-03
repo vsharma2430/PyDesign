@@ -62,6 +62,12 @@ class Point3D:
         Calculate the Euclidean distance between this point and another 3D point.
         """
         return Point3D(round(x,ndigits=n_digits),round(self.y,ndigits=n_digits),round(self.z,ndigits=n_digits))
+    
+    def shift_z(self, z,n_digits=3):
+        """
+        Calculate the Euclidean distance between this point and another 3D point.
+        """
+        return Point3D(round(self.x,ndigits=n_digits),round(self.y,ndigits=n_digits),round(z,ndigits=n_digits))
 
     def __str__(self):
         """

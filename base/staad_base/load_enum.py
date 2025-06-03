@@ -112,3 +112,7 @@ class LoadCase(IntEnum):
     ThermalLateral_GX = 8
     ThermalLateral_GZ = 9
     ContigencyLoadTransverse = 31
+    WindColumn_GX = 1101
+    WindColumn_GX_Opposite = 1201
+    WindColumn_GZ = 1301
+    WindColumn_GZ_Opposite = 1401

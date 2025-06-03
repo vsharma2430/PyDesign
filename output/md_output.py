@@ -92,3 +92,30 @@ def create_beams_markdown_table(beams):
         markdown += f"| {idx} | {start} | {end} | {beam.profile} |\n"
     
     return markdown
+
+
+def wind_load_definition_markdown(wind_loads):
+    # Markdown table header
+    markdown = "| Start Elevation | End Elevation | Windward Load | Leeward Load |\n"
+    markdown += "|-----------------|---------------|---------------|--------------|\n"
+    
+    # Add each WindLoad object as a row
+    for load in wind_loads:
+        markdown += f"| {load.start_ele:.1f} | {load.end_ele:.1f} | {load.windward:.4f} | {load.leeward:.4f} |\n"
+    
+    # Display the Markdown
+    return markdown
+
+def wind_load_assignment_markdown(heading,wind_loads):
+    # Markdown table header
+    markdown = "#####{heading}\n"
+    markdown = "| Col_id | Load |\n"
+    markdown += "|-----------------|---------------|\n"
+    
+    # Add each WindLoad object as a row
+    for col_id,load in wind_loads:
+        markdown += f"| {col_id} | {load} |\n"
+    
+    # Display the Markdown
+    return markdown
+
