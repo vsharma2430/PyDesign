@@ -122,8 +122,8 @@ def add_member_force(load,BeamNo:int, load_object : ConcentratedLoad):
 def add_member_uniform_force(load,BeamNo:int, load_object : UniformLoad):
     return load.AddMemberUniformForce(BeamNo,load_object.direction,load_object.force_value,load_object.d1_value,load_object.d2_value,load_object.d3_value)
 
-def add_selfweight_xyz(load,BeamNo,direction:MemberDirection=MemberDirection.Y):
-    return load
+def add_selfweight_xyz(load,direction:MemberDirection=MemberDirection.Y,factor:float=1):
+    return load.AddSelfWeightInXYZ(direction,factor)
 
 add_conc_forces_to_members_fn = lambda load : lambda beams, load_object : list(map(lambda beam: add_member_force(load,beam.id if isinstance(beam,Beam3D) else beam,load_object), [*beams]))
 add_uniform_forces_to_members_fn = lambda load : lambda beams, load_object : list(map(lambda beam: add_member_uniform_force(load,beam.id if isinstance(beam,Beam3D) else beam,load_object), [*beams]))

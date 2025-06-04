@@ -19,6 +19,8 @@ class PiperackMembers(IntEnum):
     DuctSupportMembers = 10
     TreeSupportMembers = 11
     WWSupportMembers = 12
+    BracketBeams = 13
+    BracketBraces = 14
 
 class Piperack:
     def __init__(self,base:Point3D,portals:list = [],longitudinal_beams:list = []):

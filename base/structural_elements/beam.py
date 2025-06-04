@@ -67,6 +67,11 @@ class Beam3D(Member):
         self.start.y = y
         self.end.y = y
         return self
+    
+    def shift_to_x(self,x):
+        self.start.x = x
+        self.end.x = x
+        return self
         
     def mid(self) -> Point3D:
         return self.start.mid(self.end)

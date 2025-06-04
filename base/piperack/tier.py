@@ -26,11 +26,13 @@ class Tier:
         base: Point3D = Point3D(0, 0, 0),
         beams: Optional[List[Beam3D]] = None,
         int_beams: Optional[List[Beam3D]] = None,
+        brackets: Optional[List[Beam3D]] = None,
         loads: Optional[List[Load]] = None,
         clt_loads: Optional[List[Load]] = None,
         material: Material = Material.STEEL,
         tier_type :TierType = TierType.Piping ,
-        intermediate_transverse_beam:bool = True
+        intermediate_transverse_beam:bool = True,
+        bracket_provision:bool = False,
     ) -> None:
         """Initialize a Tier with a base point, beams, loads, and material.
 
@@ -46,6 +48,7 @@ class Tier:
         self.base = base
         self.material = material
         self.beams = beams if beams is not None else []
+        self.brackets = brackets if brackets is not None else []
         self.int_beams = int_beams if beams is not None else []
         self.loads = loads if loads is not None else []
         self.clt_loads = clt_loads if clt_loads is not None else []
@@ -55,7 +58,8 @@ class Tier:
             self.intermediate_transverse_beam = False
             
         self.intermediate_transverse_beam = intermediate_transverse_beam
-        
+        self.bracket_provision = bracket_provision
+
         # Validate input types
         if not isinstance(base, Point3D):
             raise TypeError("base must be a Point3D object.")
@@ -98,6 +102,20 @@ class Tier:
             raise TypeError("beam must be a Beam3D object.")
         self.beams.append(beam)
 
+    def add_bracket(self, beam: Beam3D) -> None:
+        """Add a single Beam3D to the tier.
+
+        Args:
+            beam (Beam3D): Beam3D object to add.
+
+        Raises:
+            TypeError: If beam is not a Beam3D object.
+        """
+        if not isinstance(beam, Beam3D):
+            raise TypeError("beam must be a Beam3D object.")
+        self.bracket_provision = True
+        self.brackets.append(beam)
+
     def add_int_beam(self, beam: Beam3D) -> None:
         """Add a single Beam3D to the tier.
 
@@ -139,6 +157,10 @@ class Tier:
         
     def set_intermediate_transverse_beam(self,check:bool):
         self.intermediate_transverse_beam = check
+        return self
+    
+    def set_bracket_provision(self,check:bool):
+        self.bracket_provision = check
         return self
 
     def get_beam_count(self) -> int:
