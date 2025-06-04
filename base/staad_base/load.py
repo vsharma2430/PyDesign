@@ -10,7 +10,6 @@ from base.structural_elements.beam import *
 
 open_array = lambda array,index=1 : [x[index] for x in enumerate(array)]
 
-    
 def get_load_count(load) -> int:
     loadCount = load.GetPrimaryLoadCaseCount()
     return loadCount 
@@ -122,6 +121,9 @@ def add_member_force(load,BeamNo:int, load_object : ConcentratedLoad):
 
 def add_member_uniform_force(load,BeamNo:int, load_object : UniformLoad):
     return load.AddMemberUniformForce(BeamNo,load_object.direction,load_object.force_value,load_object.d1_value,load_object.d2_value,load_object.d3_value)
+
+def add_selfweight_xyz(load,BeamNo,direction:MemberDirection=MemberDirection.Y):
+    return load
 
 add_conc_forces_to_members_fn = lambda load : lambda beams, load_object : list(map(lambda beam: add_member_force(load,beam.id if isinstance(beam,Beam3D) else beam,load_object), [*beams]))
 add_uniform_forces_to_members_fn = lambda load : lambda beams, load_object : list(map(lambda beam: add_member_uniform_force(load,beam.id if isinstance(beam,Beam3D) else beam,load_object), [*beams]))

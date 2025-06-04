@@ -105,6 +105,7 @@ class MemberDirection(IntEnum):
     PZ = 8
     
 class LoadCase(IntEnum):
+    SelfWeight = 101
     OperatingLoad = 401
     EmptyLoad = 301
     ThermalGravity_GX = 6
