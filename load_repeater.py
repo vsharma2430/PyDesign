@@ -1,9 +1,9 @@
-from staad_base.root import *
-from staad_base.geometry import *
-from staad_base.load import *
-from staad_base.transform_force import *
-from staad_base.com_array import *
-from staad_base.helper import *
+from base.staad_base.root import *
+from base.staad_base.geometry import *
+from base.staad_base.load import *
+from base.staad_base.transform_force import *
+from base.staad_base.com_array import *
+from base.staad_base.helper import *
 
 if(__name__ == '__main__'):
 
