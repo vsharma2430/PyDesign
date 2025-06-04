@@ -247,3 +247,47 @@ class Tier:
             str: Description of the tier including beam and load counts.
         """
         return f"Tier(base={self.base}, beams={self.get_beam_count()}, loads={self.get_load_count()}, material={self.material})"
+    
+    def _format_beam_list(self, beam_list: Optional[List[Beam3D]]) -> str:
+        if not beam_list:
+            return "None"
+        return ", ".join([f"{beam.id}" for beam in beam_list])
+
+    def _format_load_list(self, load_list: Optional[List[Load]]) -> str:
+        if not load_list:
+            return "None"
+        return ", ".join([f"{load.load_case}" for load in load_list])
+
+    def to_markdown(self) -> str:
+        """Generate a markdown representation of the Tier object."""
+        md = f"## Tier @ {self.base} \n"
+        md += "| Attribute | Value |\n"
+        md += "|-----------|-------|\n"
+        md += f"| Base Point | ({self.base.x}, {self.base.y}, {self.base.z}) |\n"
+        md += f"| Material | {self.material.name} |\n"
+        md += f"| Tier Type | {self.tier_type.name} |\n"
+        md += f"| Intermediate Transverse Beam | {self.intermediate_transverse_beam} |\n"
+        md += f"| Bracket Provision | {self.bracket_provision} |\n\n"
+        
+        md += "## Beams\n"
+        md += "| Beam Type | Count | Details |\n"
+        md += "|-----------|-------|---------|\n"
+        md += f"| Main Beams | {len(self.beams) if self.beams else 0} | {self._format_beam_list(self.beams)} |\n"
+        md += f"| Intermediate Beams | {len(self.int_beams) if self.int_beams else 0} | {self._format_beam_list(self.int_beams)} |\n"
+        md += f"| Brackets | {len(self.brackets) if self.brackets else 0} | {self._format_beam_list(self.brackets)} |\n\n"
+        
+        md += "## Loads\n"
+        md += "| Load Type | Count | Details |\n"
+        md += "|-----------|-------|---------|\n"
+        md += f"| Standard Loads | {len(self.loads) if self.loads else 0} | {self._format_load_list(self.loads)} |\n"
+        md += f"| CLT Loads | {len(self.clt_loads) if self.clt_loads else 0} | {self._format_load_list(self.clt_loads)} |\n"
+        
+        return md
+    
+    def beams_to_markdown(self) -> str:
+        md += f"| {self.base.y} | {len(self.beams) if self.beams else 0} | {self._format_beam_list(self.beams)} |\n"
+        return md
+    
+    def int_beams_to_markdown(self) -> str:
+        md += f"| {self.base.y} | {len(self.int_beams) if self.int_beams else 0} | {self._format_beam_list(self.int_beams)} |\n"
+        return md
