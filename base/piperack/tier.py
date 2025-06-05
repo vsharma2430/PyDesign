@@ -285,9 +285,9 @@ class Tier:
         return md
     
     def beams_to_markdown(self) -> str:
-        md += f"| {self.base.y} | {len(self.beams) if self.beams else 0} | {self._format_beam_list(self.beams)} |\n"
+        return f"| {self.base.y} | {len(self.beams) if self.beams else 0} | {self._format_beam_list(self.beams)} |\n"
         return md
     
     def int_beams_to_markdown(self) -> str:
-        md += f"| {self.base.y} | {len(self.int_beams) if self.int_beams else 0} | {self._format_beam_list(self.int_beams)} |\n"
+        return f"| {self.base.y} | {len(self.int_beams) if self.int_beams else 0} | {self._format_beam_list(self.int_beams)} |\n"
         return md

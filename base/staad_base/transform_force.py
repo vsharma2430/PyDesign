@@ -14,8 +14,7 @@ class TransformLoadCase:
 
     def __repr__(self):
         return (f"TransformLoadCase(id={self.id}, source={self.source}, "
-                f"destination={self.destination}, predicate={self.predicate}, "
-                f"direction={self.direction})")
+                f"destination={self.destination}, predicate={self.predicate}, direction={self.direction})")
     
 def convert_force_operation (openSTAAD,STAAD_objects,transform_load_case_object):
         source = transform_load_case_object.source
