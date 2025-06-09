@@ -2,8 +2,7 @@ from base.staad_base.com_array import *
 from base.geometry_base.point import *
 from base.structural_elements.beam import *
 from base.staad_base.property import *
-
-point_precision = 3
+from base.staad_base.helper import *
 
 def get_node_count(geometry) -> int:
     nodeCount = geometry.GetNodeCount()
@@ -38,7 +37,6 @@ def get_node_incidences(geometry) -> dict:
         node_incidence = get_node_incidence(geometry=geometry,nodeNo=nodeNo)
         result[nodeNo] = node_incidence
     return result
-
 
 def get_beam_count(geometry) -> int:
     beamCount = geometry.GetMemberCount()
@@ -127,6 +125,28 @@ def get_node_number(geometry,point:Point3D):
         point.__round__()
         return geometry.GetNodeNumber(point.x,point.y,point.z)
     return None
+
+def get_intersect_beams_count(geometry,beams=None,tolerance=0.001):
+    return geometry.GetIntersectBeamsCount(beams,tolerance)
+
+def intersect_beams(geometry,tolerance=0.001):
+    safe_array_beam_list = make_safe_array_long(get_intersect_beams_count(geometry))
+    beams = make_variant_vt_ref(safe_array_beam_list, automation.VT_ARRAY | automation.VT_I4) # signed 32 bit integer
+    geometry.IntersectBeams(2,None,tolerance,beams)
+    return open_array(beams)
+
+def get_breakable_beam_count(geometry,nodes):
+    return geometry.GetCountOfBreakableBeamsAtSpecificNodes(make_safe_array_long(values=nodes))
+
+def break_beams(geometry,nodes):
+    safe_array_beam_list_1 = make_safe_array_long(get_breakable_beam_count(geometry,nodes))
+    beams_1 = make_variant_vt_ref(safe_array_beam_list_1, automation.VT_ARRAY | automation.VT_I4) # signed 32 bit integer
+
+    safe_array_beam_list_2 = make_safe_array_long(get_breakable_beam_count(geometry,nodes))
+    beams_2 = make_variant_vt_ref(safe_array_beam_list_2, automation.VT_ARRAY | automation.VT_I4) # signed 32 bit integer
+
+    geometry.BreakBeamsAtSpecificNodes(make_safe_array_long(values=nodes),beams_1,beams_2)
+    return {'existing_beams':open_array(beams_1),'new_beams':open_array(beams_2)}
 
 add_beams_fn = lambda geometry : lambda beams : list(map(lambda beam: add_beam(geometry=geometry, beam=beam), [*beams]))
 select_beams_fn = lambda geometry : lambda beams : list(map(lambda beam: select_beam(geometry=geometry, beamNo=beam), [*beams]))

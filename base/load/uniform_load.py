@@ -3,7 +3,7 @@ from base.staad_base.load_enum import *
 from copy import deepcopy
 
 class UniformLoad(Load):
-    def __init__(self, direction: MemberDirection = MemberDirection.Y, force_value: float = -1, 
+    def __init__(self, direction: MemberDirection = MemberDirection.GY, force_value: float = -1, 
                  d1_value: float = 0, d2_value: float = 0, d3_value: float = 0, 
                  load_case: LoadCase = LoadCase.OperatingLoad):
         """

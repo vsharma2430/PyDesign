@@ -1,3 +1,10 @@
+from typing import List, Optional
+from base.geometry_base.point import Point3D
+from base.geometry_base.line import Line3D
+from base.staad_base.load_enum import MemberDirection
+from base.load.conc_load import ConcentratedLoad, LoadCase
+from base.load.uniform_load import UniformLoad
+
 class Cable:
     def __init__(self, name: str, diameter: float, length: float):
         """
@@ -18,42 +25,73 @@ class Cable:
 
 
 class InstrumentationDuct:
-    def __init__(self, width: float, height: float, length: float, material: str = "steel"):
+    def __init__(
+        self,
+        width: float,
+        height: float,
+        material: str = "steel",
+        edge_line: Optional[Line3D] = None
+    ):
         """
-        Represents an instrumentation duct.
+        Represents an instrumentation duct with loads and edge line.
         - width: Width of the duct in millimeters.
         - height: Height of the duct in millimeters.
-        - length: Length of the duct in meters.
-        - material: Material of the duct (default is steel).
+        - material: Material of the duct (e.g., 'steel', 'aluminum').
+        - edge_line: Line3D object representing the duct's centerline.
         """
-        self.width = width
-        self.height = height
-        self.length = length
+        self.width = width  # mm
+        self.height = height  # mm
         self.material = material
-        self.cables = []
+        self.cables: List[Cable] = []
+        self.loads: List[UniformLoad] = []  # Store UniformLoad objects
+        # Initialize edge_line; default to a 1-meter line along z-axis if None
+        self.edge_line = edge_line if edge_line else Line3D(
+            Point3D(0, 0, 0),
+            Point3D(0, 0, 1000)  # Default 1 meter (1000 mm)
+        )
+
+    def calculate_length(self) -> float:
+        """
+        Calculate the length of the duct's centerline in meters.
+        """
+        return self.edge_line.length() / 1000  # Convert mm to meters
 
     def add_cable(self, cable: Cable):
         """
-        Add a cable to the duct.
+        Add a cable to the duct and create a corresponding UniformLoad.
+        - cable: Cable object with diameter and weight_per_meter.
         """
         self.cables.append(cable)
+        # Calculate cable weight per meter (N/m) = weight_per_meter (kg/m) * g (9.81 m/s²)
+        cable_force = cable.weight_per_meter * 9.81
+        # Assume cable weight acts downward (Y-direction) as a uniform load
+        cable_load = UniformLoad(
+            direction=MemberDirection.Y,
+            force_value=-cable_force,  # Negative for downward force
+            load_case=LoadCase.DeadLoad
+        )
+        self.loads.append(cable_load)
 
-    def total_cable_diameter(self):
+    def add_external_load(self, load: UniformLoad):
         """
-        Calculate the total diameter of all cables in the duct.
+        Add an external uniform load to the duct.
+        - load: UniformLoad object representing the load.
         """
-        return sum(cable.diameter for cable in self.cables)
+        self.loads.append(load)
 
-    def is_overcrowded(self):
+    def total_load(self) -> float:
         """
-        Check if the duct is overcrowded (total cable diameter exceeds duct dimensions).
+        Calculate the total load on the duct in Newtons over its length.
+        Sums force_value (N/m) * length (m) for all loads.
         """
-        return self.total_cable_diameter() > self.width or self.total_cable_diameter() > self.height
+        return sum(load.get_force() * self.calculate_length() for load in self.loads)
 
-    def __str__(self):
-        return (f"InstrumentationDuct(width={self.width}mm, height={self.height}mm, length={self.length}m, "
-                f"material={self.material}, num_cables={len(self.cables)}, overcrowded={self.is_overcrowded()})")
+    def set_edge_line(self, edge_line: Line3D):
+        """
+        Update the duct's centerline.
+        - edge_line: Line3D object representing the new centerline.
+        """
+        self.edge_line = edge_line
 
-    def __repr__(self):
-        return (f"InstrumentationDuct(width={self.width}mm, height={self.height}mm, length={self.length}m, "
-                f"material={self.material}, num_cables={len(self.cables)}, overcrowded={self.is_overcrowded()})")
+    def get_member_lines(self) -> List[Line3D]:
+        return [self.edge_line,self.edge_line.shift(Point3D(self.width,0,0))]

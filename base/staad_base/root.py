@@ -99,6 +99,12 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     geometry._FlagAsMethod("GetSelectedBeams") 
     geometry._FlagAsMethod("RenumberBeam") 
     
+    geometry._FlagAsMethod("BreakBeamsAtSpecificNodes") 
+    geometry._FlagAsMethod("GetCountOfBreakableBeamsAtSpecificNodes") 
+    
+    geometry._FlagAsMethod("GetIntersectBeamsCount") 
+    geometry._FlagAsMethod("IntersectBeams") 
+    
     #support
     support._FlagAsMethod("AssignSupportToNode")
     support._FlagAsMethod("CreateSupportFixed")
@@ -113,6 +119,29 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     geometry._FlagAsMethod("GetGroupEntityCount") 
     geometry._FlagAsMethod("GetGroupEntities") 
     geometry._FlagAsMethod("GetGroupNames") 
+
+    #materials
+    property._FlagAsMethod('GetBeamMaterialName')
+    property._FlagAsMethod('GetElementMaterialName')
+    property._FlagAsMethod('GetIsotropicMaterialAssignedBeamCount')
+    property._FlagAsMethod('GetIsotropicMaterialAssignedBeamList')
+    property._FlagAsMethod('GetIsotropicMaterialCount')
+    property._FlagAsMethod('GetIsotropicMaterialProperties')
+    property._FlagAsMethod('GetIsotropicMaterialPropertiesAssigned')
+    property._FlagAsMethod('GetMaterialProperty')
+    property._FlagAsMethod('GetOrthotropic2DMaterialCount')
+    property._FlagAsMethod('GetOrthotropic2DMaterialProperties')
+    property._FlagAsMethod('GetOrthotropic3DMaterialCount')
+    property._FlagAsMethod('GetOrthotropic3DMaterialProperties')
+    property._FlagAsMethod('GetPlateMaterialName')
+    property._FlagAsMethod('RemoveBeamMaterialHelper')
+    property._FlagAsMethod('RemoveMaterialFromBeam')
+        
+    property._FlagAsMethod('AssignMaterialToMember')
+    property._FlagAsMethod('AssignMaterialToPlate')
+    property._FlagAsMethod('AssignMaterialToSolid')
+    property._FlagAsMethod('SetMaterialID')
+    property._FlagAsMethod('SetMaterialName')
 
     #property
     property._FlagAsMethod('GetBeamSectionDisplayName')

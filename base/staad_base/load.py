@@ -8,8 +8,6 @@ from base.load.uniform_load import *
 from base.load.uniform_moment import *
 from base.structural_elements.beam import *
 
-open_array = lambda array,index=1 : [x[index] for x in enumerate(array)]
-
 def get_load_count(load) -> int:
     loadCount = load.GetPrimaryLoadCaseCount()
     return loadCount 

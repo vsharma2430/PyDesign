@@ -106,14 +106,17 @@ class MemberDirection(IntEnum):
     
 class LoadCase(IntEnum):
     SelfWeight = 101
-    OperatingLoad = 401
+    LiveLoad = 201
     EmptyLoad = 301
+    OperatingLoad = 401
     ThermalGravity_GX = 6
     ThermalGravity_GZ = 7
     ThermalLateral_GX = 8
     ThermalLateral_GZ = 9
     ContigencyLoadTransverse = 31
     WindColumn_GX = 1101
+    WindTier_GX = 1102
     WindColumn_GX_Opposite = 1201
+    WindTier_GX_Opposite = 1202
     WindColumn_GZ = 1301
     WindColumn_GZ_Opposite = 1401

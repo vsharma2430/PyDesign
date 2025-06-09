@@ -23,17 +23,17 @@ def get_ctype_double(tuple:bool=True):
 def get_ctype_string(tuple:bool=True):
     return get_ctype(type=ctypes.c_char,tuple=tuple)
 
-def make_safe_array_int(size): 
-    return automation._midlSAFEARRAY(ctypes.c_int).create([0]*size)
+def make_safe_array_int(size=1,values=None): 
+    return automation._midlSAFEARRAY(ctypes.c_int).create(([0]*size) if (not values) else values)
 
-def make_safe_array_long(size): 
-    return automation._midlSAFEARRAY(ctypes.c_long).create([0]*size)
+def make_safe_array_long(size=1,values=None): 
+    return automation._midlSAFEARRAY(ctypes.c_long).create(([0]*size) if (not values) else values)
 
-def make_safe_array_float(size): 
-    return automation._midlSAFEARRAY(ctypes.c_float).create([0]*size)
+def make_safe_array_float(size=1,values=None): 
+    return automation._midlSAFEARRAY(ctypes.c_float).create(([0]*size) if (not values) else values)
 
-def make_safe_array_double(size): 
-    return automation._midlSAFEARRAY(ctypes.c_double).create([0]*size)
+def make_safe_array_double(size=1,values=None): 
+    return automation._midlSAFEARRAY(ctypes.c_double).create(([0]*size) if (not values) else values)
 
 def make_variant_vt_ref(obj, var_type):
     var = automation.VARIANT()

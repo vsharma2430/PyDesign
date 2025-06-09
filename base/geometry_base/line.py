@@ -1,4 +1,5 @@
 import math
+from copy import deepcopy
 from base.geometry_base.shape import Shape
 from base.geometry_base.point import Point, Point3D
 
@@ -101,6 +102,12 @@ class Line3D(LineBase):
         if not (isinstance(start, Point3D) and isinstance(end, Point3D)):
             raise TypeError("Start and end must be Point3D objects")
         super().__init__(start, end)
+
+    def shift(self,point:Point3D):
+        line = deepcopy(self)
+        line.start = line.start + point
+        line.end = line.end + point
+        return line
 
     def length(self) -> float:
         """

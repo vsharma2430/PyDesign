@@ -1,3 +1,5 @@
+point_precision = 3
+
 def try_catch_wrapper(func):
     def wrapper(*args, **kwargs):
         try:
@@ -18,3 +20,5 @@ def convert_kn_to_mt(x):
 
 def unique_list(x):
     return list(dict.fromkeys(x))
+
+open_array = lambda array,index=1 : [x[index] for x in enumerate(array)]
