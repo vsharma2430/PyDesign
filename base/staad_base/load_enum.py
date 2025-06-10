@@ -106,6 +106,7 @@ class MemberDirection(IntEnum):
     
 class LoadCase(IntEnum):
     SelfWeight = 101
+    DeadLoadElecIns = 103
     LiveLoad = 201
     EmptyLoad = 301
     OperatingLoad = 401

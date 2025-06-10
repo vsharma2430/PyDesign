@@ -3,6 +3,7 @@ from base.geometry_base.line import Line3D
 from base.staad_base.load_enum import MemberDirection
 from base.load.conc_load import ConcentratedLoad, LoadCase
 from base.load.uniform_load import UniformLoad
+from base.structural_elements.beam import Beam3D
 
 class TreeSupportMember:
     """A class representing a tree support member with geometric and structural properties.
@@ -18,7 +19,8 @@ class TreeSupportMember:
         line: Line3D,
         support_member: bool = True,
         max_tree_to_tree_distance: float = 3.0,
-        tree_load: float = 2.8
+        tree_load: float = 2.8,
+        members: List[Beam3D] = []
     ) -> None:
         """Initialize a TreeSupportMember with validation.
 
@@ -45,6 +47,7 @@ class TreeSupportMember:
         self.support_member = support_member
         self.tree_to_tree_distance = max_tree_to_tree_distance
         self.tree_load = tree_load
+        self.members = members if members else []
 
     def __repr__(self) -> str:
         """Return a string representation of the TreeSupportMember."""
@@ -85,3 +88,18 @@ class TreeSupportMember:
         if new_distance < 0:
             raise ValueError("new_distance cannot be negative")
         self.tree_to_tree_distance = new_distance
+
+    def get_tree_load(self):
+        return ConcentratedLoad(force_value=self.tree_load*-1,load_case=LoadCase.DeadLoadElecIns)
+
+    def add_member(self, member: Beam3D) -> None:
+        """Add a single Beam3D member to the flare."""
+        if not isinstance(member, Beam3D):
+            raise TypeError("Member must be a Beam3D instance")
+        self.members.append(member)
+
+    def add_members(self, members: List[Beam3D]) -> None:
+        """Add multiple Beam3D members to the flare."""
+        if not all(isinstance(m, Beam3D) for m in members):
+            raise TypeError("All members must be Beam3D instances")
+        self.members.extend(members)

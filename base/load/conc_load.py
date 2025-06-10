@@ -111,3 +111,9 @@ class ConcentratedLoad(Load):
             return True
         else:
             return False
+        
+    def set_d1(self, d1:float):
+        load = deepcopy(self)
+        load.d1_value = d1
+        return load
+    
