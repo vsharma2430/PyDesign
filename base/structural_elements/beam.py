@@ -2,6 +2,7 @@ import math
 from copy import deepcopy
 from base.structural_elements.member import Member
 from base.geometry_base.point import Point3D
+from base.geometry_base.line import Line3D
 
 class Beam3D(Member):
     def __init__(self,start: Point3D = Point3D(), end: Point3D = Point3D(1,0,0), id:int =-1, 
@@ -21,21 +22,21 @@ class Beam3D(Member):
         """
         Calculate the length of the 3D beam using the Euclidean distance formula.
         """
-        return math.sqrt(
-            (self.end.x - self.start.x)**2 +
-            (self.end.y - self.start.y)**2 +
-            (self.end.z - self.start.z)**2
-        )
+        return Line3D(self.start,self.end).length()
+    
+    def get_line(self):
+        """
+        Calculate the direction vector of the 3D beam.
+        Returns a tuple (dx, dy, dz) representing the direction.
+        """
+        return Line3D(self.start,self.end)
 
     def direction_vector(self):
         """
         Calculate the direction vector of the 3D beam.
         Returns a tuple (dx, dy, dz) representing the direction.
         """
-        dx = self.end.x - self.start.x
-        dy = self.end.y - self.start.y
-        dz = self.end.z - self.start.z
-        return (dx, dy, dz)
+        return Line3D(self.start,self.end).direction_vector()
 
     def stress(self, force: float):
         """

@@ -24,37 +24,39 @@ def get_closest_lower_value_then_higher_value(arr, target):
     return max(lower_values) if max(lower_values) != target else min(higher_values)
 
 def group_consecutive_numbers(numbers):
+    """Group consecutive numbers into ranges or single numbers.
+    
+    Args:
+        numbers: List of integers
+    Returns:
+        List containing single numbers or [start, end] ranges
+    """
     if not numbers:
         return []
     
-    # Sort the list to ensure numbers are in order
-    numbers = sorted(numbers)
+    numbers = sorted(numbers, key=int)  # Ensure proper sorting for non-integer inputs
     result = []
-    start = numbers[0]
-    prev = numbers[0]
+    start = prev = numbers[0]
     
     for num in numbers[1:]:
         if num == prev + 1:
-            # Consecutive number found, update previous
             prev = num
         else:
-            # Break in sequence, add the range or single number
-            if start == prev:
-                result.append(start)
-            else:
-                result.append([start, prev])
-            start = num
-            prev = num
+            result.append(start if start == prev else [start, prev])
+            start = prev = num
     
-    # Handle the last group or number
-    if start == prev:
-        result.append(start)
-    else:
-        result.append([start, prev])
-    
+    result.append(start if start == prev else [start, prev])
     return result
 
 def format_consecutive_numbers(grouped_list):
-    formatted = [f"{start} To {end}" if isinstance(item, list) else str(item) for item, start, end in 
-                [(item, item[0], item[1]) if isinstance(item, list) else (item, None, None) for item in grouped_list]]
-    return " ".join(formatted)
+    """Format grouped numbers into a string representation.
+    
+    Args:
+        grouped_list: List of single numbers or [start, end] ranges
+    Returns:
+        Formatted string of numbers and ranges
+    """
+    def format_item(item):
+        return f"{item[0]} To {item[1]}" if isinstance(item, list) else str(item)
+    
+    return " ".join(format_item(item) for item in grouped_list)

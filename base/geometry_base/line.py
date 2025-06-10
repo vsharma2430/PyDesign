@@ -158,3 +158,64 @@ class Line3D(LineBase):
         cos_theta = xy_magnitude / line_magnitude
         cos_theta = min(1.0, max(-1.0, cos_theta))  # Handle numerical errors
         return math.degrees(math.acos(cos_theta))
+    
+    def contains_point(self, point: Point3D, tolerance: float = 1e-4) -> bool:
+        """
+        Check if a given 3D point lies on the line segment between start and end points.
+        
+        Args:
+            point: The Point3D to check.
+            tolerance: Floating-point tolerance for numerical comparisons (default: 1e-4).
+        
+        Returns:
+            bool: True if the point lies on the line segment, False otherwise.
+        """
+        # Vector from start to end (direction vector)
+        dx = self.end.x - self.start.x
+        dy = self.end.y - self.start.y
+        dz = self.end.z - self.start.z
+        
+        # Vector from start to the point
+        px = point.x - self.start.x
+        py = point.y - self.start.y
+        pz = point.z - self.start.z
+        
+        # Check for degenerate line (start = end)
+        if abs(dx) < tolerance and abs(dy) < tolerance and abs(dz) < tolerance:
+            # Line is a point; check if point equals start
+            return (abs(px) < tolerance and 
+                    abs(py) < tolerance and 
+                    abs(pz) < tolerance)
+        
+        # Compute t for each coordinate where possible (non-zero denominator)
+        t_values = []
+        if abs(dx) > tolerance:
+            t_values.append(px / dx)
+        if abs(dy) > tolerance:
+            t_values.append(py / dy)
+        if abs(dz) > tolerance:
+            t_values.append(pz / dz)
+        
+        # If no t values (all denominators zero), point must be at start
+        if not t_values:
+            return (abs(px) < tolerance and 
+                    abs(py) < tolerance and 
+                    abs(pz) < tolerance)
+        
+        # Check if all computed t values are approximately equal
+        t = t_values[0]
+        for t_other in t_values[1:]:
+            if abs(t - t_other) > tolerance:
+                return False
+        
+        # Verify the point satisfies the parametric equation
+        # (needed for cases where some coordinates are zero)
+        if not (abs(px - t * dx) < tolerance and
+                abs(py - t * dy) < tolerance and
+                abs(pz - t * dz) < tolerance):
+            return False
+        
+        # NEW: Check if the point is within the bounds of the line segment
+        # The parameter t should be between 0 and 1 (inclusive) for the point
+        # to lie on the line segment between start and end
+        return 0.0 <= t <= 1.0
