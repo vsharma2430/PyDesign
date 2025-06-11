@@ -47,7 +47,10 @@ def get_beam_length(geometry,beamNo) -> float:
     return round(beamLength,point_precision)
 
 def select_beam(geometry,beamNo) -> None:
-    geometry.SelectBeam(int(beamNo))
+    if(isinstance(beamNo,int)):
+        geometry.SelectBeam(int(beamNo))
+    elif(isinstance(beamNo,Beam3D)):
+        geometry.SelectBeam(beamNo.id)
     return 
 
 def get_beam_incidence(geometry,beamNo) -> float:

@@ -101,3 +101,12 @@ def group_beams_by_y(beams):
             groups[y] = []
         groups[y].append(beam)
     return groups
+
+def group_beams_by_z(beams):
+    groups = {}
+    for beam in beams:
+        z = beam.start.z
+        if z not in groups:
+            groups[z] = []
+        groups[z].append(beam)
+    return groups

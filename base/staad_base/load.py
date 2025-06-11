@@ -2,11 +2,13 @@ from functools import lru_cache
 from base.staad_base.com_array import *
 from base.staad_base.helper import *
 from base.staad_base.load_enum import *
+from base.load.nodal_load import *
 from base.load.conc_load import *
 from base.load.conc_moment import *
 from base.load.uniform_load import *
 from base.load.uniform_moment import *
 from base.structural_elements.beam import *
+from base.staad_base.geometry import get_node_number
 
 def get_load_count(load) -> int:
     loadCount = load.GetPrimaryLoadCaseCount()
@@ -113,6 +115,16 @@ def get_member_load_info(load,load_case,load_index_no:int) -> list:
     distances = distances[0]
 
     return {'direction':direction.value,'forces':list(map(convert_kn_to_mt,open_array(forces))),'distances':open_array(distances)}
+
+def add_node_conc_force(load,nodeNo:int, load_object : NodalLoad):
+    return load.AddNodalLoad(nodeNo, load_object.FX, load_object.FY, load_object.FZ, load_object.MX, load_object.MY, load_object.MZ)
+
+def add_point_conc_force(load,geometry,point:Point3D, load_object : NodalLoad):
+    nodeNo = get_node_number(geometry,point)
+    if(nodeNo):
+        return load.AddNodalLoad(nodeNo, load_object.FX, load_object.FY, load_object.FZ, load_object.MX, load_object.MY, load_object.MZ)
+    else:
+        return False
 
 def add_member_conc_force(load,BeamNo:int, load_object : ConcentratedLoad):
     return load.AddMemberConcForce(BeamNo,load_object.direction,load_object.force_value,load_object.d1_value,load_object.d2_value)
