@@ -6,6 +6,7 @@ from base.staad_base.com_array import *
 from base.staad_base.helper import *
 
 if(__name__ == '__main__'):
+    openSTAAD,STAAD_objects = get_openSTAAD()
 
     piperack_convert_objects = [
         TransformLoadCase(id='empty'              , source=401, destination=301, predicate=lambda x:  x * 0.4  , direction=None),
@@ -15,7 +16,5 @@ if(__name__ == '__main__'):
         TransformLoadCase(id='thermal lateral(GZ)', source=401, destination=9  , predicate=lambda x: -x * 0.05 , direction=6)
     ]
 
-    openSTAAD,STAAD_objects = get_openSTAAD()
-
     for convert_object in piperack_convert_objects:
-        convert_force_operation(openSTAAD,STAAD_objects,convert_object)
+        convert_force_operation(STAAD_objects= STAAD_objects,transform_load_case_object=convert_object)

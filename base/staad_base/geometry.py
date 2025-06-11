@@ -8,6 +8,10 @@ def get_node_count(geometry) -> int:
     nodeCount = geometry.GetNodeCount()
     return nodeCount
 
+def get_selected_node_count(geometry) -> int:
+    nodeCount = geometry.GetNoOfSelectedNodes()
+    return nodeCount
+
 def get_selected_beam_count(geometry) -> int:
     nodeCount = geometry.GetNoOfSelectedBeams()
     return nodeCount
@@ -53,6 +57,11 @@ def select_beam(geometry,beamNo) -> None:
         geometry.SelectBeam(beamNo.id)
     return 
 
+def select_node(geometry,nodeNo) -> None:
+    if(isinstance(nodeNo,int)):
+        geometry.SelectNode(int(nodeNo))
+    return False
+
 def get_beam_incidence(geometry,beamNo) -> float:
     nodeA,nodeAptr = get_ctype_long()
     nodeB,nodeBptr = get_ctype_long()
@@ -85,6 +94,20 @@ def get_selected_beam_nos(geometry,sort:int=1,tuple:bool = False) -> list:
             result.append((beam[0],beam[1]))
         else:
             result.append(beam[1])
+    return result
+
+def get_selected_node_nos(geometry,sort:int=1,tuple:bool = False) -> list:
+    nodeCount = get_selected_node_count(geometry=geometry)
+    safe_array_beam_list = make_safe_array_long(nodeCount)
+    nodes = make_variant_vt_ref(safe_array_beam_list, automation.VT_ARRAY | automation.VT_I4) # signed 32 bit integer
+    geometry.GetSelectedNodes(nodes,sort)
+    nodes = nodes[0]
+    result = []
+    for node in enumerate(nodes):
+        if(tuple):
+            result.append((node[0],node[1]))
+        else:
+            result.append(node[1])
     return result
 
 def get_beam_objects(geometry,property=None,nodes=None) -> dict[int,Beam3D]:
@@ -153,3 +176,4 @@ def break_beams(geometry,nodes):
 
 add_beams_fn = lambda geometry : lambda beams : list(map(lambda beam: add_beam(geometry=geometry, beam=beam), [*beams]))
 select_beams_fn = lambda geometry : lambda beams : list(map(lambda beam: select_beam(geometry=geometry, beamNo=beam), [*beams]))
+select_nodes_fn = lambda geometry : lambda nodes : list(map(lambda node: select_node(geometry=geometry, nodeNo=node), [*nodes]))
