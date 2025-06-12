@@ -23,6 +23,7 @@ from base.piping_elements.flare import *
 from base.structural_elements.tree_support import *
 from base.load.wind_load import *
 from base.staad_base.transform_force import *
+from base.pipe_connection.staad_helper import *
 
 openSTAAD,STAAD_objects = get_openSTAAD()
 
