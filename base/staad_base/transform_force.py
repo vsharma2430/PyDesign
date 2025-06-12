@@ -5,6 +5,8 @@ from base.staad_base.load import *
 from base.staad_base.com_array import *
 from base.staad_base.helper import *
 
+get_set = lambda items:set(items) if (items and len(items)>0) else None
+
 class TransformLoadCase:
     def __init__(self, id, source, destination, predicate, direction):
         self.id = id
@@ -17,8 +19,11 @@ class TransformLoadCase:
         return (f"TransformLoadCase(id={self.id}, source={self.source}, "
                 f"destination={self.destination}, predicate={self.predicate}, direction={self.direction})")
 
-def convert_force_operation(STAAD_objects: OpenSTAAD_objects, transform_load_case_object: TransformLoadCase, 
-                          nodes: List[int] = None, beams: List[int] = None, generate_markdown: bool = False):
+def convert_force_operation(STAAD_objects: OpenSTAAD_objects, 
+                            transform_load_case_object: TransformLoadCase, 
+                            nodes: List[int] = None, 
+                            beams: List[int] = None, 
+                            generate_markdown: bool = False):
     """
     Convert force operations from source to destination load case with optional markdown output
     
@@ -39,7 +44,10 @@ def convert_force_operation(STAAD_objects: OpenSTAAD_objects, transform_load_cas
     transform_id = transform_load_case_object.id
 
     load_object = STAAD_objects.load
-    
+
+    node_set = get_set(nodes)
+    beam_set = get_set(beams)
+
     # Initialize markdown content if requested
     markdown_content = [] if generate_markdown else None
     
@@ -63,6 +71,9 @@ def convert_force_operation(STAAD_objects: OpenSTAAD_objects, transform_load_cas
 
     # Start processing
     add_output(f"Transformation: {source} → {destination}", 0)
+
+    add_output(f"Selected Nodes: {node_set if node_set else "All"}", 1)
+    add_output(f"Selected Beams: {beam_set if beam_set else "All"}", 1)
 
     for load_case_i in [source]:
         set_load_case_active(load_object, load_case_i)
@@ -116,9 +127,10 @@ def convert_force_operation(STAAD_objects: OpenSTAAD_objects, transform_load_cas
                     if destination:
                         set_load_case_active(load_object, destination)
                         for node_i in load_type_incidences[load_type_i][0]:
-                            transformed_forces = list(map(predicate, node_forces['forces']))
-                            success = load_object.AddNodalLoad(node_i, *transformed_forces)
-                            results.append(f"Node {node_i}: {'✅' if success else '❌'}")
+                            if((node_set and node_i in node_set) or (not node_set)):
+                                transformed_forces = list(map(predicate, node_forces['forces']))
+                                success = load_object.AddNodalLoad(node_i, *transformed_forces)
+                                results.append(f"Node {node_i}: {'✅' if success else '❌'}")
 
             elif load_type_i in [LoadItemNo.ConcentratedForce, LoadItemNo.UniformForce]:
                 if (load_type_i in load_type_incidences and 
@@ -130,19 +142,21 @@ def convert_force_operation(STAAD_objects: OpenSTAAD_objects, transform_load_cas
                         set_load_case_active(load_object, destination)
                         
                         for beam_i in load_type_incidences[load_type_i][0]:
-                            force_direction = direction if direction else member_forces['direction']
-                            transformed_force = first_non_zero(list(map(predicate, member_forces['forces'])))
-                            
-                            if load_type_i == LoadItemNo.ConcentratedForce:
-                                distances = member_forces['distances'][:2]
-                                success = load_object.AddMemberConcForce(beam_i, force_direction, 
-                                                                       transformed_force, *distances)
-                            else:  # UniformForce
-                                distances = member_forces['distances']
-                                success = load_object.AddMemberUniformForce(beam_i, force_direction, 
-                                                                          transformed_force, *distances)
-                            
-                            results.append(f"Beam {beam_i}: {'✅' if success else '❌'}")
+
+                            if((beam_set and beam_i in beam_set) or (not beam_set)):
+                                force_direction = direction if direction else member_forces['direction']
+                                transformed_force = first_non_zero(list(map(predicate, member_forces['forces'])))
+                                
+                                if load_type_i == LoadItemNo.ConcentratedForce:
+                                    distances = member_forces['distances'][:2]
+                                    success = load_object.AddMemberConcForce(beam_i, force_direction, 
+                                                                        transformed_force, *distances)
+                                else:  # UniformForce
+                                    distances = member_forces['distances']
+                                    success = load_object.AddMemberUniformForce(beam_i, force_direction, 
+                                                                            transformed_force, *distances)
+                                
+                                results.append(f"Beam {beam_i}: {'✅' if success else '❌'}")
 
             # Clean up processed incidences
             if (destination and load_type_i in load_type_incidences and 
@@ -163,20 +177,27 @@ def convert_force_operation(STAAD_objects: OpenSTAAD_objects, transform_load_cas
 
 
 def convert_force_operation_to_markdown(STAAD_objects: OpenSTAAD_objects, 
-                                      transform_load_case_object: TransformLoadCase,
-                                      nodes: List[int] = None, beams: List[int] = None):
+                                        transform_load_case_object: TransformLoadCase,
+                                        nodes: List[int] = None, 
+                                        beams: List[int] = None):
     """
     Convenience function to generate markdown output for force conversion operation
     
     Returns:
         str: Markdown formatted string of the conversion process
     """
-    return convert_force_operation(STAAD_objects, transform_load_case_object, 
-                                 nodes, beams, generate_markdown=True)
+    return convert_force_operation(STAAD_objects=STAAD_objects, 
+                                    transform_load_case_object=transform_load_case_object, 
+                                    nodes=nodes,
+                                    beams= beams, 
+                                    generate_markdown=True)
 
 
 # Example usage functions for Jupyter notebook
-def display_conversion_markdown(STAAD_objects, transform_objects):
+def display_conversion_markdown(STAAD_objects: OpenSTAAD_objects, 
+                                transform_objects:List[TransformLoadCase],
+                                nodes: List[int] = None, 
+                                beams: List[int] = None):
     """
     Display conversion results as markdown in Jupyter notebook
     
@@ -195,7 +216,7 @@ def display_conversion_markdown(STAAD_objects, transform_objects):
     for i, transform_obj in enumerate(transform_objects, 1):
         all_markdown.append(f"---")
         all_markdown.append("")
-        markdown_result = convert_force_operation_to_markdown(STAAD_objects, transform_obj)
+        markdown_result = convert_force_operation_to_markdown(STAAD_objects=STAAD_objects, transform_load_case_object=transform_obj,nodes=nodes,beams=beams)
         all_markdown.append(markdown_result)
         all_markdown.append("")
     
@@ -205,7 +226,11 @@ def display_conversion_markdown(STAAD_objects, transform_objects):
     return "\n".join(all_markdown)
 
 
-def save_conversion_report(STAAD_objects, transform_objects, filename="load_conversion_report.md"):
+def save_conversion_report(STAAD_objects: OpenSTAAD_objects, 
+                           transform_objects:List[TransformLoadCase],
+                           nodes: List[int] = None, 
+                           beams: List[int] = None, 
+                           filename="load_conversion_report.md"):
     """
     Save conversion results to a markdown file
     
@@ -216,7 +241,7 @@ def save_conversion_report(STAAD_objects, transform_objects, filename="load_conv
     """
     from datetime import datetime
     
-    markdown_content = display_conversion_markdown(STAAD_objects, transform_objects)
+    markdown_content = display_conversion_markdown(STAAD_objects=STAAD_objects, transform_objects=transform_objects,nodes=nodes,beams=beams)
     
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(markdown_content)
