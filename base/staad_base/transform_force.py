@@ -8,32 +8,35 @@ from base.staad_base.helper import *
 get_set = lambda items:set(items) if (items and len(items)>0) else None
 
 class TransformLoadCase:
-    def __init__(self, id, source, destination, predicate, direction):
+    def __init__(self, id, source, destination, predicate, source_direction : MemberForceDirection = None, destination_direction:MemberForceDirection = None):
         self.id = id
         self.source = source
         self.destination = destination
         self.predicate = predicate
-        self.direction = direction
+        self.source_direction = source_direction
+        self.destination_direction = destination_direction
 
     def __repr__(self):
         return (f"TransformLoadCase(id={self.id}, source={self.source}, "
-                f"destination={self.destination}, predicate={self.predicate}, direction={self.direction})")
-    
+                f"destination={self.destination}, predicate={self.predicate}, "
+                f"source_direction={self.source_direction}, destination_direction={self.destination_direction})")
+
     def to_markdown(self):
         """
         Generates Markdown documentation for this TransformLoadCase instance.
-        
+
         Returns:
             str: Markdown-formatted string describing the instance.
         """
-        markdown = f"""# TransformLoadCase Instance
-            ## Instance Details
-            - **ID**: {self.id}
-            - **Source**: {self.source}
-            - **Destination**: {self.destination}
-            - **Predicate**: {self.predicate}
-            - **Direction**: {self.direction}
-            """
+        markdown = f""" # TransformLoadCase Instance
+                        ## Instance Details
+                        - **ID**: {self.id}
+                        - **Source**: {self.source}
+                        - **Destination**: {self.destination}
+                        - **Predicate**: {self.predicate}
+                        - **Source Direction**: {self.source_direction}
+                        - **Destination Direction**: {self.destination_direction}
+                    """
         return markdown
 
 def convert_force_operation(STAAD_objects: OpenSTAAD_objects, 
@@ -56,7 +59,8 @@ def convert_force_operation(STAAD_objects: OpenSTAAD_objects,
     """
     source = transform_load_case_object.source
     destination = transform_load_case_object.destination
-    direction = transform_load_case_object.direction
+    source_direction = transform_load_case_object.source_direction
+    destination_direction = transform_load_case_object.destination_direction
     predicate = transform_load_case_object.predicate
     transform_id = transform_load_case_object.id
 
@@ -148,6 +152,9 @@ def convert_force_operation(STAAD_objects: OpenSTAAD_objects,
                                 transformed_forces = list(map(predicate, node_forces['forces']))
                                 success = load_object.AddNodalLoad(node_i, *transformed_forces)
                                 results.append(f"Node {node_i}: {'✅' if success else '❌'}")
+                            else:
+                                results.append(f"Node {node_i}: {'❌'}")
+
 
             elif load_type_i in [LoadItemNo.ConcentratedForce, LoadItemNo.UniformForce]:
                 if (load_type_i in load_type_incidences and 
@@ -160,20 +167,24 @@ def convert_force_operation(STAAD_objects: OpenSTAAD_objects,
                         
                         for beam_i in load_type_incidences[load_type_i][0]:
 
-                            if((beam_set and beam_i in beam_set) or (not beam_set)):
-                                force_direction = direction if direction else member_forces['direction']
+                            if(((beam_set and beam_i in beam_set) or (not beam_set)) and 
+                                ((not source_direction) or (source_direction == member_forces['direction']))):
+
+                                force_direction = destination_direction if destination_direction else member_forces['direction']
                                 transformed_force = first_non_zero(list(map(predicate, member_forces['forces'])))
                                 
                                 if load_type_i == LoadItemNo.ConcentratedForce:
                                     distances = member_forces['distances'][:2]
                                     success = load_object.AddMemberConcForce(beam_i, force_direction, 
                                                                         transformed_force, *distances)
-                                else:  # UniformForce
+                                elif load_type_i == LoadItemNo.UniformForce: 
                                     distances = member_forces['distances']
                                     success = load_object.AddMemberUniformForce(beam_i, force_direction, 
                                                                             transformed_force, *distances)
                                 
                                 results.append(f"Beam {beam_i}: {'✅' if success else '❌'}")
+                            else:
+                                results.append(f"Beam {beam_i}: {'❌'}")
 
             # Clean up processed incidences
             if (destination and load_type_i in load_type_incidences and 

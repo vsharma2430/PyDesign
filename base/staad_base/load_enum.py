@@ -121,3 +121,12 @@ class LoadCase(IntEnum):
     WindTier_GX_Opposite = 1202
     WindColumn_GZ = 1301
     WindColumn_GZ_Opposite = 1401
+    
+class MemberForceDirection(IntEnum):
+    LocalX = 1
+    LocalY = 2
+    LocalZ = 3
+    GlobalX = 4
+    GlobalY = 5
+    GlobalZ = 6
+

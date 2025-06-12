@@ -14,8 +14,8 @@ from base.piperack.tier import *
 from base.staad_base.load import *
 from base.staad_base.design import *
 from base.staad_base.property import *
-
 from base.staad_base.optimise_member import *
+from base.staad_base.transform_force import *
 
 def create_profile_markdown_table(
     concrete_profiles: Dict[Enum, Union[Rectangle, str, int, float]],
@@ -187,4 +187,48 @@ def wind_load_assignment_markdown(heading,wind_loads):
     
     # Display the Markdown
     return markdown
+
+def transform_load_case_markdown(transform_objects):
+    """
+    Generate a markdown table for transform load cases.
+    
+    Args:
+        transform_objects: Iterable of objects with id, source, destination, predicate, and direction attributes.
+    
+    Returns:
+        str: Formatted markdown table as a string.
+    
+    Raises:
+        AttributeError: If an object lacks required attributes.
+        TypeError: If predicate is not callable or input is invalid.
+    """
+    markdown_table = """
+## Transform Load Case Table
+> #### Source Load Case -> Force value = 1
+| ID                    | Source | Destination | Predicate Value | Direction |
+|-----------------------|--------|-------------|-----------------|-----------|
+"""
+    
+    try:
+        obj:TransformLoadCase
+        for obj in transform_objects:
+            # Safely access direction and handle None
+            direction_str = str(obj.destination_direction) if obj.destination_direction is not None else 'None'
+            
+            # Calculate and format predicate value with error handling
+            try:
+                predicate_value = f"{obj.predicate(x=1):.3f}"
+            except (TypeError, AttributeError) as e:
+                predicate_value = "Error"
+            
+            # Use consistent string formatting for alignment
+            markdown_table += (
+                f"| {obj.id:<21} | {obj.source:^6} | {obj.destination:^11} "
+                f"| {predicate_value:^15} | {direction_str:^9} |\n"
+            )
+    
+    except AttributeError as e:
+        raise AttributeError(f"Invalid object in transform_objects: missing required attribute - {e}")
+    
+    return markdown_table
 
