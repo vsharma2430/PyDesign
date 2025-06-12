@@ -50,3 +50,30 @@ class UniformLoad(Load):
                 f"force={self.force_value}, "
                 f"d1={self.d1_value}, d2={self.d2_value}, d3={self.d3_value}, "
                 f"load_case={self.load_case.name})")
+    
+    def to_markdown(self) -> str:
+            """
+            Generate a detailed Markdown table representation of the UniformLoad object.
+            
+            Returns:
+                str: A string containing a Markdown table with load details.
+            """
+            markdown = "| Property | Value |\n"
+            markdown += "|----------|-------|\n"
+            markdown += f"| Type | UniformLoad |\n"
+            markdown += f"| Direction | {self.direction.name} |\n"
+            markdown += f"| Force Value | {self.force_value:.3f} |\n"
+            markdown += f"| D1 | {self.d1_value:.3f} |\n"
+            markdown += f"| D2 | {self.d2_value:.3f} |\n"
+            markdown += f"| D3 | {self.d3_value:.3f} |\n"
+            markdown += f"| Load Case | {self.load_case.name} |\n"
+            return markdown
+        
+    def to_markdown_compact(self) -> str:
+            """
+            Generate a compact single-line representation for table cells.
+            
+            Returns:
+                str: Compact load description.
+            """
+            return f"Uniform({self.direction.name}, F={self.force_value:.2f}/m, d1={self.d1_value:.2f}-{self.d2_value:.2f})"

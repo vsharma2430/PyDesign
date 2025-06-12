@@ -18,6 +18,23 @@ class TransformLoadCase:
     def __repr__(self):
         return (f"TransformLoadCase(id={self.id}, source={self.source}, "
                 f"destination={self.destination}, predicate={self.predicate}, direction={self.direction})")
+    
+    def to_markdown(self):
+        """
+        Generates Markdown documentation for this TransformLoadCase instance.
+        
+        Returns:
+            str: Markdown-formatted string describing the instance.
+        """
+        markdown = f"""# TransformLoadCase Instance
+            ## Instance Details
+            - **ID**: {self.id}
+            - **Source**: {self.source}
+            - **Destination**: {self.destination}
+            - **Predicate**: {self.predicate}
+            - **Direction**: {self.direction}
+            """
+        return markdown
 
 def convert_force_operation(STAAD_objects: OpenSTAAD_objects, 
                             transform_load_case_object: TransformLoadCase, 

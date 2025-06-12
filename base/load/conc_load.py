@@ -117,3 +117,29 @@ class ConcentratedLoad(Load):
         load.d1_value = d1
         return load
     
+    def to_markdown(self) -> str:
+        """
+        Generate a detailed Markdown table representation of the ConcentratedLoad object.
+        
+        Returns:
+            str: A string containing a Markdown table with load details.
+        """
+        markdown = "| Property | Value |\n"
+        markdown += "|----------|-------|\n"
+        markdown += f"| Type | ConcentratedLoad |\n"
+        markdown += f"| Direction | {self.direction.name} |\n"
+        markdown += f"| Force Value | {self.force_value:.3f} |\n"
+        markdown += f"| Apply Point | ({self.global_apply_point.x:.3f}, {self.global_apply_point.y:.3f}, {self.global_apply_point.z:.3f}) |\n"
+        markdown += f"| D1 | {self.d1_value:.3f} |\n"
+        markdown += f"| D2 | {self.d2_value:.3f} |\n"
+        markdown += f"| Load Case | {self.load_case.name} |\n"
+        return markdown
+    
+    def to_markdown_compact(self) -> str:
+        """
+        Generate a compact single-line representation for table cells.
+        
+        Returns:
+            str: Compact load description.
+        """
+        return f"Conc({self.direction.name}, F={self.force_value:.2f}, d1={self.d1_value:.2f})"

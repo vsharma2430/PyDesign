@@ -2,7 +2,6 @@ from enum import Enum
 from IPython.display import Markdown, display
 from dataclasses import dataclass
 from typing import Union, Dict
-
 from base.helper.general import *
 from base.geometry_base.rectangle import *
 from base.staad_base.geometry import *
@@ -58,39 +57,109 @@ def create_spec_markdown_table(start_release_spec,end_release_spec,truss_spec,of
     markdown_output += f"| Offset Member | {offset_member_spec} |\n"
     return markdown_output
 
-def create_tiers_markdown_table(tiers, title="Tier List"):
-    markdown = "# Tier List\n\n"
-    markdown += "| Tier Number | Elevation (y) | Load Type |\n"
-    markdown += "|-------------|---------------|-----------|\n"
+
+def create_tiers_markdown_table(tiers: List[Tier], title: str = "Tier List") -> str:
+    """
+    Create a Markdown table for a list of Tier objects, displaying elevation and load counts.
     
-    # Iterate through tiers and add to markdown table
+    Args:
+        tiers (List[Tier]): List of Tier objects to display.
+        title (str): Title of the Markdown table (default: "Tier List").
+    
+    Returns:
+        str: Formatted Markdown table as a string.
+    """
+    markdown = f"# {title}\n\n"
+    markdown += "| Tier | Elevation (y) | Loads | Wind Loads | CLT Loads |\n"
+    markdown += "|------|---------------|-------|------------|----------|\n"
+    
     for i, tier in enumerate(tiers, 1):
-        elevation = tier.base.y
-        load_types = ", ".join(str(load) for load in tier.loads) if tier.loads else "None"
-        markdown += f"| Tier {i} | {elevation} | {load_types} |\n"
+        elevation = f"{tier.base.y:.2f}"
+        load_count = len(tier.loads)
+        wind_load_count = len(tier.wind_loads) if tier.wind_loads else 0
+        clt_load_count = len(tier.clt_loads) if tier.clt_loads else 0
+        
+        markdown += (
+            f"| Tier {i} | {elevation} | {load_count} | "
+            f"{wind_load_count} | {clt_load_count} |\n"
+        )
     
     return markdown
 
-def create_beams_markdown_table(beams):
+
+def create_detailed_tiers_load_markdown(tiers: List[Tier], title: str = "Detailed Tier Information") -> str:
     """
-    Convert a list of Beam3D objects to a Markdown table with start, end, and profile.
+    Create detailed Markdown output for tiers with individual load details in a beautified format.
     
     Args:
-        beams (list): List of Beam3D objects.
-        
+        tiers (List[Tier]): List of Tier objects to display.
+        title (str): Title of the output (default: "Detailed Tier Information").
+    
     Returns:
-        str: Markdown table string containing beam start, end, and profile.
+        str: Formatted detailed Markdown as a string.
     """
-    # Header for the Markdown table
-    markdown = "| ID | Start (x,y,z) | End (x,y,z) | Profile |\n"
-    markdown += "|----|---------------|-------------|---------|\n"
-    
-    # Iterate through beams with an index as ID
-    for idx, beam in enumerate(beams, 1):
-        start = f"({beam.start.x:.2f}, {beam.start.y:.2f}, {beam.start.z:.2f})"
-        end = f"({beam.end.x:.2f}, {beam.end.y:.2f}, {beam.end.z:.2f})"
-        markdown += f"| {idx} | {start} | {end} | {beam.profile} |\n"
-    
+    markdown = f"# {title}\n\n"
+
+    # Summary Table
+    markdown += "## Tier Summary\n\n"
+    markdown += "| Tier | Elevation (y) | Type | Loads | CLT Loads | Wind Loads |\n"
+    markdown += "|------|---------------|------|-------|-----------|------------|\n"
+    for i, tier in enumerate(tiers, 1):
+        markdown += (
+            f"| Tier {i} | {tier.base.y:.2f}m | {tier.tier_type.name} | "
+            f"{len(tier.loads)} | {len(tier.clt_loads)} | {len(tier.wind_loads)} |\n"
+        )
+    markdown += "\n---\n\n"
+
+    markdown += "<details><summary>Details</summary>\n\n"
+
+    # Detailed Tier Information
+    for i, tier in enumerate(tiers, 1):
+        markdown += f"## Tier {i} - Elevation: {tier.base.y:.2f}m\n\n"
+
+        markdown += "<details><summary>View Tier Details</summary>\n\n"
+        markdown += "\n\n"
+        markdown += tier.to_markdown() + "\n\n"
+        markdown += "</details>\n\n"
+
+        markdown += "<details><summary>View Loads</summary>\n\n"
+
+        # Loads Section
+        if tier.loads:
+            markdown += "### Loads\n\n"
+            markdown += "<details><summary>View Loads</summary>\n\n"
+            for j, load in enumerate(tier.loads, 1):
+                markdown += "\n\n"
+                markdown += load.to_markdown() + "\n\n"
+            markdown += "\n\n</details>\n\n"
+
+        # Wind Loads Section
+        if tier.wind_loads:
+            markdown += "### Wind Loads\n\n"
+            markdown += "<details><summary>View Wind Loads</summary>\n\n"
+            for j, load in enumerate(tier.wind_loads, 1):
+                markdown += "\n\n"
+                markdown += load.to_markdown() + "\n\n"
+            markdown += "</details>\n\n"
+
+        # CLT Loads Section
+        if tier.clt_loads:
+            markdown += "### CLT Loads\n\n"
+            markdown += "<details><summary>View CLT Loads</summary>\n\n"
+            for j, load in enumerate(tier.clt_loads, 1):
+                markdown += "\n\n"
+                markdown += load.to_markdown() + "\n\n"
+            markdown += "</details>\n\n"
+
+        markdown += "</details>\n\n"
+        
+
+        # Separator for all tiers except the last
+        if i < len(tiers):
+            markdown += "---\n\n"
+
+    markdown += "</details>\n\n"
+
     return markdown
 
 

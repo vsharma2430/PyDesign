@@ -77,3 +77,40 @@ class NodalLoad(Load):
     def __repr__(self):
         """Formal string representation."""
         return self.__str__()
+    
+    def to_markdown(self) -> str:
+        """
+        Generate a detailed Markdown table representation of the NodalLoad object.
+        
+        Returns:
+            str: A string containing a Markdown table with load details.
+        """
+        markdown = "| Property | Value |\n"
+        markdown += "|----------|-------|\n"
+        markdown += f"| Type | NodalLoad |\n"
+        markdown += f"| FX | {self.FX:.3f} |\n"
+        markdown += f"| FY | {self.FY:.3f} |\n"
+        markdown += f"| FZ | {self.FZ:.3f} |\n"
+        markdown += f"| MX | {self.MX:.3f} |\n"
+        markdown += f"| MY | {self.MY:.3f} |\n"
+        markdown += f"| MZ | {self.MZ:.3f} |\n"
+        markdown += f"| Load Case | {self.load_case.name} |\n"
+        return markdown
+    
+    def to_markdown_compact(self) -> str:
+        """
+        Generate a compact single-line representation for table cells.
+        
+        Returns:
+            str: Compact load description.
+        """
+        forces = []
+        if self.FX != 0: forces.append(f"FX={self.FX:.2f}")
+        if self.FY != 0: forces.append(f"FY={self.FY:.2f}")
+        if self.FZ != 0: forces.append(f"FZ={self.FZ:.2f}")
+        if self.MX != 0: forces.append(f"MX={self.MX:.2f}")
+        if self.MY != 0: forces.append(f"MY={self.MY:.2f}")
+        if self.MZ != 0: forces.append(f"MZ={self.MZ:.2f}")
+        
+        force_str = ", ".join(forces) if forces else "Zero"
+        return f"Nodal({force_str})"
