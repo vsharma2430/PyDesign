@@ -95,6 +95,7 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     geometry._FlagAsMethod("GetBeamList") 
     geometry._FlagAsMethod("GetBeamLength") 
     geometry._FlagAsMethod("GetMemberIncidence") 
+    geometry._FlagAsMethod("ClearMemberSelection") 
     geometry._FlagAsMethod("SelectBeam") 
     geometry._FlagAsMethod("GetNoOfBeamsConnectedAtNode") 
     geometry._FlagAsMethod("GetNoOfSelectedBeams") 
