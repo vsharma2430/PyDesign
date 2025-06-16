@@ -4,6 +4,7 @@ from time import sleep
 from IPython.display import Markdown, display
 from typing import List, Optional
 from base.pipe_connection.pipe_client import PipeClient
+from base.pipe_connection.message import *
 
 pipe_name = "STAAD_HELPER_PIPE"
 
@@ -27,7 +28,7 @@ def open_staad_helper():
     except Exception as e:
         print(f"Error opening application: {e}")
 
-def apply_parameters_staad_helper(
+def get_pipe_messages(
     beam_nos: List[int] = [],
     parameter_no: int = 1,
     lx: bool = True,
@@ -35,43 +36,56 @@ def apply_parameters_staad_helper(
     lz: bool = True,
     dj: bool = False,
     main: bool = True,
+) -> List[dict]:
+    return [
+        message_select_beams(beam_nos),
+        message_lx(lx),
+        message_ly(ly),
+        message_lz(lz),
+        message_dj(dj),
+        message_main(main),
+        message_parameter_no(parameter_no),
+        message_apply,
+        message_select_beams(None),
+    ]
+
+def apply_parameters_staad_helper(
+    messages: List[dict] = [],
     display_output: bool = True,
-    wait_time:int=10,
+    wait_time: int = 10,
 ) -> str:
     """
     Apply parameters to STAAD Helper via named pipe connection.
     Returns concise markdown-formatted table and optionally displays it in Jupyter.
 
     Args:
-        beam_nos: List of beam numbers to select
-        parameter_no: Parameter number to apply
-        lx: Lateral X-bracing flag
-        ly: Lateral Y-bracing flag
-        lz: Lateral Z-bracing flag
-        dj: Displacement joint flag
-        main: Main parameters flag
+        messages: List of message dictionaries to send to STAAD Helper
         display_output: If True, displays markdown in Jupyter; always returns string
+        wait_time: Time to wait (in seconds) for critical operations
 
     Returns:
         Markdown-formatted string containing execution results in tabular form
     """
+    # If no messages provided, generate default messages
+    if not messages:
+        return
+
     messages = [
         {"type": "command", "action": "read_all_data"},
         {"type": "command", "action": "open_steel_tab"},
-        {"type": "staad_ui", "feature": "select", "payload": beam_nos},
-        {"type": "ui", "feature": "lx", "payload": lx},
-        {"type": "ui", "feature": "ly", "payload": ly},
-        {"type": "ui", "feature": "lz", "payload": lz},
-        {"type": "ui", "feature": "dj", "payload": dj},
-        {"type": "ui", "feature": "main", "payload": main},
-        {"type": "ui", "feature": "parameter", "payload": parameter_no},
-        {"type": "staad_ui", "feature": "select", "payload": None},
-        {"type": "command", "action": "apply_parameters"},
+        *messages,
         {"type": "command", "action": "close"},
     ]
 
     def format_beam_selection() -> List[str]:
         """Format beam selection information."""
+        # Extract beam_nos from messages
+        beam_nos = []
+        for msg in messages:
+            if msg.get('type') == 'staad_ui' and msg.get('feature') == 'select':
+                beam_nos = msg.get('payload', [])
+                break
+        
         if not beam_nos:
             return ["**Selected Beams:** All beams (no specific selection)"]
         
@@ -86,18 +100,33 @@ def apply_parameters_staad_helper(
 
     def format_configuration() -> List[str]:
         """Format configuration parameters."""
+        # Extract configuration from messages
+        config = {
+            'lx': True,
+            'ly': True,
+            'lz': True,
+            'dj': False,
+            'main': True
+        }
+        parameter_no = 1
+        for msg in messages:
+            if msg.get('type') == 'ui' and msg.get('feature') in config:
+                config[msg['feature']] = msg.get('payload', config[msg['feature']])
+            elif msg.get('type') == 'ui' and msg.get('feature') == 'parameter':
+                parameter_no = msg.get('payload', 1)
+        
         return [
-            f"- **LX (Lateral X):** {'✓' if lx else '✗'}",
-            f"- **LY (Lateral Y):** {'✓' if ly else '✗'}",
-            f"- **LZ (Lateral Z):** {'✓' if lz else '✗'}",
-            f"- **DJ (Displacement Joint):** {'✓' if dj else '✗'}",
-            f"- **Main Parameters:** {'✓' if main else '✗'}",
+            f"**Parameter Number:** {parameter_no}",
+            f"- **LX (Lateral X):** {'✓' if config['lx'] else '✗'}",
+            f"- **LY (Lateral Y):** {'✓' if config['ly'] else '✗'}",
+            f"- **LZ (Lateral Z):** {'✓' if config['lz'] else '✗'}",
+            f"- **DJ (Displacement Joint):** {'✓' if config['dj'] else '✗'}",
+            f"- **Main Parameters:** {'✓' if config['main'] else '✗'}",
         ]
 
     # Build markdown output
     markdown_output = [
         "# STAAD Helper Parameter Application",
-        f"**Parameter Number:** {parameter_no}",
         "",
         "## Beam Selection",
         *format_beam_selection(),
@@ -127,7 +156,7 @@ def apply_parameters_staad_helper(
                 markdown_output.append(f"| {i} | {action} | {status_icon} {status} | {message} |")
 
                 # Set sleep time based on message type
-                sleep_time = wait_time if msg.get('action') in ['read_all_data', 'apply_parameters'] else 0.5
+                sleep_time = wait_time if msg.get('action') in ['read_all_data', 'apply_parameters', 'open_steel_tab'] else 0.5
                 sleep(sleep_time)
 
             markdown_output.extend([
