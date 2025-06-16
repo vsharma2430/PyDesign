@@ -267,6 +267,8 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     output._FlagAsMethod("GetPMemberEndForces")
     output._FlagAsMethod("GetPMemberIntermediateForcesAtDistance")
 
+    output._FlagAsMethod("CreateSteelDesignCommand")
+    
     output._FlagAsMethod("AssignDesignCommand")
     output._FlagAsMethod("AssignDesignGroup")
     output._FlagAsMethod("AssignDesignParameter")

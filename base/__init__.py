@@ -32,6 +32,7 @@ property = STAAD_objects.property
 output = STAAD_objects.output
 support = STAAD_objects.support
 load = STAAD_objects.load
+design = STAAD_objects.design
 
 add_beams = add_beams_fn(geometry=geometry)
 select_beams = select_beams_fn(geometry=geometry)
@@ -55,3 +56,9 @@ def beam_list_copy_and_display(beam_list):
         display(Markdown(f'copied **{len(beam_list)}** members : {selected_members}'))
     else:
         display(Markdown(f'No member selected'))
+
+def open_staad_helper_wrapper(predicate):
+    open_staad_helper()
+    sleep(5)
+    predicate()
+    sleep(5)

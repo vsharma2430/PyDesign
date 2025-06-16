@@ -35,3 +35,9 @@ def get_member_steel_design_results(output,beam_numbers=[]):
     for beam_no in beam_numbers:
         result[beam_no] = get_steel_design_result(output,beam_no)
     return result
+
+def assign_design_command(design,breif_no=1,name=None,value=1,members:list=[]):
+    return design.AssignDesignCommand(breif_no,name,value,make_safe_array_long(len(members),values=members))
+
+def assign_design_parameter(design,breif_no=1,name=None,value=1,members:list=[]):
+    return design.AssignDesignParameter(breif_no,name,value,make_safe_array_long(len(members),values=members))
