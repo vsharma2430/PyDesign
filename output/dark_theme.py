@@ -75,3 +75,14 @@ dark_vbox = widgets.Layout(
     border='2px solid #404040',
     border_radius='8px',
     margin='5px')
+
+dark_hbox = widgets.Layout(
+    align_items='flex-start',
+    padding='10px',
+    background_color='#1a1a1a',  # Dark background
+    border='2px solid #404040',
+    border_radius='8px',
+    margin='5px',
+    overflow='auto',  # Still useful for vertical scrolling if content exceeds height
+    flex_flow='row wrap'  # Allows content to wrap to the next row
+)

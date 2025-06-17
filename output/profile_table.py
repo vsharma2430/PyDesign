@@ -16,7 +16,7 @@ def create_html_widget_output(data):
     html = f"""
     <div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-top: 10px; font-family: Arial, sans-serif;">
         <h3 style="color: #495057; margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #007bff; padding-bottom: 5px;">
-            📊 Data Results ({len(data)} records)
+            📊 STAAD Profiles ({len(data)} records)
         </h3>
         <table style="width: 100%; border-collapse: collapse;">
             <thead>

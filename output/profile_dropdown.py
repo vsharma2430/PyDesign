@@ -25,7 +25,7 @@ def create_steel_section_widget(sections):
         for classification in sorted(grouped[intended_use].keys(), key=lambda x: x.value):
             # Add classification subheader if there are multiple classifications
             if len(grouped[intended_use]) > 1:
-                options.append((f"  └── {classification.value}", None))
+                options.append((f"   └─── {classification.value}", None))
             
             # Sort sections by section name within each classification
             sorted_sections = sorted(grouped[intended_use][classification], 
@@ -132,13 +132,11 @@ def create_button(label,predicate):
 
 def insert_profile_button_click(get_section_ref_no,
                                 steel_dropdown,
-                                staad_section_ref_nos,
-                                simple_create_steel_beam_property):
+                                staad_section_ref_nos):
     
     selected_section = steel_dropdown.value
     ref_no = get_section_ref_no(selected_section=selected_section,
-                                staad_section_ref_nos=staad_section_ref_nos,
-                                simple_create_steel_beam_property=simple_create_steel_beam_property)
+                                staad_section_ref_nos=staad_section_ref_nos)
     
     display({'section':steel_dropdown.value.staad_name,'ref_no':ref_no})
     return
@@ -146,7 +144,6 @@ def insert_profile_button_click(get_section_ref_no,
 def apply_profile_button_click(get_section_ref_no,
                                steel_dropdown,
                                staad_section_ref_nos,
-                               simple_create_steel_beam_property,
                                geometry,get_selected_beam_nos,
                                beam_list_copy_and_display,
                                assign_profile):
@@ -155,6 +152,5 @@ def apply_profile_button_click(get_section_ref_no,
     selected_beams = get_selected_beam_nos(geometry=geometry)
     beam_list_copy_and_display(selected_beams)
     display(assign_profile(beams=selected_beams,property_no=get_section_ref_no(selected_section=selected_section,
-                                                                        staad_section_ref_nos=staad_section_ref_nos,
-                                                                        simple_create_steel_beam_property=simple_create_steel_beam_property)))
+                                                                                staad_section_ref_nos=staad_section_ref_nos)))
     return

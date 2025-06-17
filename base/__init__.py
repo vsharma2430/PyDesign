@@ -72,8 +72,7 @@ def open_staad_helper_wrapper(predicate):
     sleep(5)
 
 def get_section_ref_no(selected_section,
-                       staad_section_ref_nos,
-                       simple_create_steel_beam_property):
+                       staad_section_ref_nos):
     
     if(selected_section.staad_name):
         if(selected_section.staad_name in staad_section_ref_nos):
