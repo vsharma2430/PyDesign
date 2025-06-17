@@ -96,7 +96,7 @@ beams_sorted_yxz = lambda beams : sorted(beams, key=lambda beam: (beam.start.y, 
 def group_beams_by_y(beams):
     groups = {}
     for beam in beams:
-        y = beam.start.y
+        y = min(beam.start.y,beam.end.y)
         if y not in groups:
             groups[y] = []
         groups[y].append(beam)

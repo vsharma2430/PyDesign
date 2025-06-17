@@ -1,6 +1,4 @@
 from enum import Enum
-from IPython.display import Markdown, display
-from dataclasses import dataclass
 from typing import Union, Dict
 from base.helper.general import *
 from base.geometry_base.rectangle import *
@@ -16,6 +14,9 @@ from base.staad_base.design import *
 from base.staad_base.property import *
 from base.staad_base.optimise_member import *
 from base.staad_base.transform_force import *
+from collections import defaultdict
+import ipywidgets as widgets
+
 
 def create_profile_markdown_table(
     concrete_profiles: Dict[Enum, Union[Rectangle, str, int, float]],
@@ -232,3 +233,67 @@ def transform_load_case_markdown(transform_objects):
     
     return markdown_table
 
+def md_elevation_wise_column_table(columns_z):
+    markdown_output = '### Column Table\n'
+    markdown_output += '| Elevation | Columns |\n'
+    markdown_output += '|-----------|---------|\n'
+
+    for z in sorted(columns_z.keys()):  # Sort elevations in ascending order
+        beam_ids = ', '.join([str(beam.id) for beam in columns_z[z]])
+        markdown_output += f'| {z} | {beam_ids} |\n'
+    return markdown_output
+
+def md_tier_wise_beams(tiers):
+    markdown_output = '### Tier Beams Table\n'
+    markdown_output += '| Tier Elevation | Count | Beams |\n'
+    markdown_output += '|-----------|---------| -------|\n'
+
+    for tier_x in tiers:
+        markdown_output += tier_x.beams_to_markdown()
+    return markdown_output
+
+def md_tier_wise_int_beams(tiers):
+    markdown_output = '### Tier Intermediate Beams Table\n'
+    markdown_output += '| Tier Elevation | Count | Int. Beams |\n'
+    markdown_output += '|-----------|---------| -------|\n'
+
+    for tier_x in tiers:
+        markdown_output += tier_x.int_beams_to_markdown()
+    return markdown_output
+
+def md_vertical_braces(columns_z,vertical_braces):
+    columns_z = defaultdict(list)
+    for beam in vertical_braces:
+        columns_z[beam.start.y].append(beam)
+
+    markdown_output = '### Vertical Braces\n'
+    markdown_output += '| Elevation | Braces |\n'
+    markdown_output += '|-----------|---------|\n'
+    for z in sorted(columns_z.keys()):  # Sort elevations in ascending order
+        beam_ids = ', '.join([str(beam.id) for beam in columns_z[z]])
+        markdown_output += f'| {z} | {beam_ids} |\n'
+    return markdown_output
+
+
+def md_plan_braces(columns_z,plan_braces):
+    columns_z = defaultdict(list)
+    for beam in plan_braces:
+        columns_z[beam.start.y].append(beam)
+
+    markdown_output = '### Plan Braces\n'
+    markdown_output += '| Elevation | Braces |\n'
+    markdown_output += '|-----------|---------|\n'
+    for z in sorted(columns_z.keys()):  # Sort elevations in ascending order
+        beam_ids = ', '.join([str(beam.id) for beam in columns_z[z]])
+        markdown_output += f'| {z} | {beam_ids} |\n'    
+    return markdown_output
+
+def md_long_beams(title='Long Beams',long_beams=[]):
+    long_dict = group_beams_by_y(long_beams)
+    markdown_output = f'### {title}\n'
+    markdown_output += '| Elevation | Beams |\n'
+    markdown_output += '|-----------|---------|\n'
+    for z in sorted(long_dict.keys()):  # Sort elevations in ascending order
+        beam_ids = ', '.join([str(beam.id) for beam in long_dict[z]])
+        markdown_output += f'| {z} | {beam_ids} |\n'    
+    return markdown_output

@@ -7,33 +7,63 @@ from base.staad_base.design import *
 
 def calculate_average(ratios: Dict[str, float]) -> float:
     """
-    Calculate the average of critical ratios
+    Calculate the average of critical ratios, excluding outliers using IQR method.
     
     Args:
         ratios: Dictionary of member names and their critical ratios
     
     Returns:
-        Average critical ratio
+        Average critical ratio after removing outliers
     """
     if not ratios:
         return 0.0
     
-    return sum(ratios.values()) / len(ratios)
+    values = list(ratios.values())
+    if len(values) < 4:  # Need enough data for meaningful IQR
+        return sum(values) / len(values)
+    
+    # Calculate Q1, Q3, and IQR
+    sorted_values = sorted(values)
+    q1 = statistics.quantiles(sorted_values, n=4)[0]
+    q3 = statistics.quantiles(sorted_values, n=4)[2]
+    iqr = q3 - q1
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+    
+    # Filter out outliers
+    filtered_values = [v for v in values if lower_bound <= v <= upper_bound]
+    
+    return sum(filtered_values) / len(filtered_values) if filtered_values else 0.0
 
 def calculate_deviation(ratios: Dict[str, float]) -> float:
     """
-    Calculate the standard deviation of critical ratios
+    Calculate the standard deviation of critical ratios, excluding outliers using IQR method.
     
     Args:
         ratios: Dictionary of member names and their critical ratios
     
     Returns:
-        Standard deviation of critical ratios
+        Standard deviation of critical ratios after removing outliers
     """
     if len(ratios) < 2:
         return 0.0
     
-    return statistics.stdev(ratios.values())
+    values = list(ratios.values())
+    if len(values) < 4:  # Need enough data for meaningful IQR
+        return statistics.stdev(values) if len(values) >= 2 else 0.0
+    
+    # Calculate Q1, Q3, and IQR
+    sorted_values = sorted(values)
+    q1 = statistics.quantiles(sorted_values, n=4)[0]
+    q3 = statistics.quantiles(sorted_values, n=4)[2]
+    iqr = q3 - q1
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+    
+    # Filter out outliers
+    filtered_values = [v for v in values if lower_bound <= v <= upper_bound]
+    
+    return statistics.stdev(filtered_values) if len(filtered_values) >= 2 else 0.0
 
 def get_failed_members(ratios: Dict[str, float], threshold: float = 1.0) -> List[str]:
     """

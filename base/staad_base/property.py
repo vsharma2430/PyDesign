@@ -52,3 +52,6 @@ def assign_material_to_beam(property,material_name,beam_no):
 assign_specification = lambda property : lambda beams,spec_no : list(map(lambda beam: assign_beam_specification(property=property, beam_no=beam,spec_no=spec_no), [*beams]))
 assign_profile = lambda property : lambda beams,property_no : list(map(lambda beam: assign_beam_property(property=property, beam_no=beam,property_no=property_no), [*beams]))
 assign_material = lambda property : lambda material_name : lambda beams : list(map(lambda beam: assign_material_to_beam(property=property, beam_no=beam,material_name=material_name), [*beams]))
+
+simple_create_concrete_beam_property_fn = lambda property : lambda profile : create_concrete_beam_property(property,profile)
+simple_create_steel_beam_property_fn = lambda property: lambda country=None,profile='' : create_steel_beam_property(property,(35 if 'SHS' in profile else 10) if (not country) else country,profile,0,0,0)

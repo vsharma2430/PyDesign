@@ -1,6 +1,7 @@
 from collections import defaultdict
 import pyperclip
 from IPython.display import display, Markdown
+import ipywidgets as widgets
 from base.helper.general import *
 from base.geometry_base.line import *
 from base.geometry_base.rectangle import *
@@ -24,6 +25,10 @@ from base.structural_elements.tree_support import *
 from base.load.wind_load import *
 from base.staad_base.transform_force import *
 from base.pipe_connection.staad_helper import *
+from output.button_bar import *
+from base.eil.steel_section import *
+from output.profile_table import *
+from output.profile_dropdown import *
 
 openSTAAD,STAAD_objects = get_openSTAAD()
 
@@ -42,17 +47,20 @@ assign_specification = assign_specification(property=property)
 add_conc_forces_to_members = add_conc_forces_to_members_fn(load)
 add_uniform_forces_to_members = add_uniform_forces_to_members_fn(load)
 
+simple_create_concrete_beam_property = simple_create_concrete_beam_property_fn(property=property)
+simple_create_steel_beam_property = simple_create_steel_beam_property_fn(property=property)
+
 def beam_list_select_and_display(beam_list):
     select_beams(beam_list.keys())
     display(beam_list)
 
-staad_format_list = lambda ids : format_consecutive_numbers(group_consecutive_numbers(ids))
+staad_format_id_list = lambda ids : format_consecutive_numbers(group_consecutive_numbers(ids))
+staad_format_beam_list = lambda beams : staad_format_id_list([beam.id for beam in beams])
 
 def beam_list_copy_and_display(beam_list):
     if(len(beam_list)> 0 ):
-        selected_members = staad_format_list(beam_list)
+        selected_members = staad_format_id_list(beam_list)
         pyperclip.copy(f'{selected_members}')
-        # copy(f'members={selected_members},')
         display(Markdown(f'copied **{len(beam_list)}** members : {selected_members}'))
     else:
         display(Markdown(f'No member selected'))
@@ -62,3 +70,15 @@ def open_staad_helper_wrapper(predicate):
     sleep(5)
     predicate()
     sleep(5)
+
+def get_section_ref_no(selected_section,
+                       staad_section_ref_nos,
+                       simple_create_steel_beam_property):
+    
+    if(selected_section.staad_name):
+        if(selected_section.staad_name in staad_section_ref_nos):
+            return staad_section_ref_nos[selected_section.staad_name]['id']
+        else:
+            return simple_create_steel_beam_property(profile=selected_section.staad_name)
+    else:
+        return None

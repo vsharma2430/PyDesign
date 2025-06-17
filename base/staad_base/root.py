@@ -163,7 +163,6 @@ def get_openSTAAD() -> OpenSTAAD_objects:
     property._FlagAsMethod('GetSectionTableNo')
     
     property._FlagAsMethod('AssignBeamProperty')
-    property._FlagAsMethod('GetBeamSectionPropertyRefNo	')
     property._FlagAsMethod('CreateAssignProfileProperty')
     property._FlagAsMethod('CreateBeamPropertyFromTable')
     property._FlagAsMethod('CreatePrismaticCircleProperty')
@@ -304,3 +303,115 @@ def run_analysis(openSTAAD,silent=1,hidden=0,wait=0,wait_interval=5):
         count = count + 1
         
     return retVal
+
+def get_staad_file_name():
+    import win32com.client
+    from win32com.client import VARIANT
+    import pythoncom
+
+    try:
+        # Initialize COM (required for standalone scripts)
+        pythoncom.CoInitialize()
+
+        # Connect to a running STAAD.Pro instance
+        objOpenSTAAD = win32com.client.GetObject(Class="StaadPro.OpenSTAAD")
+
+        # Create VARIANT for file name (string, passed by reference)
+        fileName = VARIANT(pythoncom.VT_BSTR | pythoncom.VT_BYREF, "")
+        bFullPath = VARIANT(pythoncom.VT_BOOL, True)
+
+        # Get the STAAD file name
+        objOpenSTAAD.GetSTAADFile(fileName, bFullPath)
+
+        # Store the result before releasing the object
+        result = fileName.value
+
+        # Explicitly release the COM object
+        objOpenSTAAD = None
+
+        return result
+
+    except Exception as e:
+        print(f"Error retrieving STAAD file name: {e}")
+        return None
+
+    finally:
+        # Uninitialize COM
+        pythoncom.CoUninitialize()
+
+def get_staad_profiles():
+    import win32com.client
+    from win32com.client import VARIANT
+    import pythoncom
+
+    try:
+        pythoncom.CoInitialize()
+        objOpenSTAAD = win32com.client.GetObject(Class="StaadPro.OpenSTAAD")
+        result = []
+        property = objOpenSTAAD.Property
+        property._FlagAsMethod('GetSectionPropertyCount')
+        property._FlagAsMethod('GetSectionPropertyName')
+        property._FlagAsMethod('GetSectionPropertyType')
+        property._FlagAsMethod('GetSectionPropertyCountry')
+        
+        count = property.GetSectionPropertyCount()
+        for i in range(1,count+1):
+            sectionName = VARIANT(pythoncom.VT_BSTR | pythoncom.VT_BYREF, "")
+            property.GetSectionPropertyName(i,sectionName)
+            sctn_type = property.GetSectionPropertyType(i)
+            country = property.GetSectionPropertyCountry(i)
+            result.append({'id':i,'name':sectionName.value,'type':sctn_type,'country':country})
+
+        objOpenSTAAD = None
+        return result
+
+    except Exception as e:
+        print (f"Error retrieving STAAD profiles: {e}")
+        return None
+
+    finally:
+        pythoncom.CoUninitialize()
+
+def replace_selfweight(file_path, old_text='SELFWEIGHT Y -1', new_text='SELFWEIGHT Y -1 LIST 1 TO 10'):
+    """
+    Opens a file, replaces the first line containing old_text with new_text,
+    and writes the modified content back to the file.
+    
+    Args:
+        file_path (str): Path to the input file
+        old_text (str): Text to search for in the file (default: 'SELFWEIGHT Y -1')
+        new_text (str): Text to replace the matching line (default: 'SELFWEIGHT Y -1 LIST 1 TO 10')
+    
+    Returns:
+        bool: True if replacement was successful, False if old_text was not found
+    """
+    try:
+        # Read the file content
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+        
+        # Replace the first line containing old_text
+        replaced = False
+        for i, line in enumerate(lines):
+            if old_text in line:
+                lines[i] = new_text + '\n'
+                replaced = True
+                break
+        
+        if not replaced:
+            print(f"Warning: '{old_text}' not found in {file_path}")
+            return False
+        
+        # Write the modified content back to the file
+        with open(file_path, 'w') as file:
+            file.writelines(lines)
+        
+        print(f"Successfully replaced '{old_text}' with '{new_text}' in {file_path}")
+        return True
+    
+    except FileNotFoundError:
+        print(f"Error: File {file_path} not found")
+        return False
+    except Exception as e:
+        print(f"Error occurred: {str(e)}")
+        return False
