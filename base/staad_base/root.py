@@ -1,6 +1,7 @@
 import time
 from comtypes import client
 from enum import IntEnum
+from base.staad_base.helper import try_catch_wrapper
 
 class AnalysisStatus(IntEnum):
     """Enum representing the status of an analysis operation."""
@@ -31,7 +32,8 @@ class OpenSTAAD_objects:
         self.property = property if property is not None else {}
         self.design = design if design is not None else {}
         self.support = support if support is not None else {}
-        
+
+@try_catch_wrapper
 def get_openSTAAD() -> OpenSTAAD_objects:
     os = client.GetActiveObject("StaadPro.OpenSTAAD")
 

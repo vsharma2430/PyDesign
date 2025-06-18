@@ -131,3 +131,6 @@ class Point3D:
             return self.z == other.z
         else:
             return self.z == other
+        
+    def tuple_ref(self):
+        return (self.x,self.y,self.z)

@@ -103,7 +103,7 @@ def create_detailed_tiers_load_markdown(tiers: List[Tier], title: str = "Detaile
 
     # Summary Table
     markdown += "## Tier Summary\n\n"
-    markdown += "| Tier | Elevation (y) | Type | Loads | CLT Loads | Wind Loads |\n"
+    markdown += "| Tier | Elevation (y) | Type | Std .Piping Loads | CLT Loads | Wind Loads |\n"
     markdown += "|------|---------------|------|-------|-----------|------------|\n"
     for i, tier in enumerate(tiers, 1):
         markdown += (
@@ -112,6 +112,7 @@ def create_detailed_tiers_load_markdown(tiers: List[Tier], title: str = "Detaile
         )
     markdown += "\n---\n\n"
 
+    markdown += "> Flare,WW,E&I and Duct loads will be added separately in their respective sections.\n\n"
     markdown += "<details><summary>Details</summary>\n\n"
 
     # Detailed Tier Information
