@@ -2,6 +2,7 @@ from collections import defaultdict
 import pyperclip
 from IPython.display import display, Markdown
 import ipywidgets as widgets
+from base.piperack.piperack import *
 from base.helper.general import *
 from base.geometry_base.line import *
 from base.geometry_base.rectangle import *
