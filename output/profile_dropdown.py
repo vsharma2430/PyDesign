@@ -29,7 +29,7 @@ def create_steel_section_widget(sections):
             
             # Sort sections by section name within each classification
             sorted_sections = sorted(grouped[intended_use][classification], 
-                                   key=lambda x: x.section)
+                                   key=lambda x: x.sl_no)
             
             for section in sorted_sections:
                 indent = "    " if len(grouped[intended_use]) > 1 else "  "
