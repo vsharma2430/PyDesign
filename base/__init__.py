@@ -28,8 +28,10 @@ from base.staad_base.transform_force import *
 from base.pipe_connection.staad_helper import *
 from output.button_bar import *
 from base.eil.steel_section import *
+from base.structural_elements.group import *
 from output.profile_table import *
 from output.profile_dropdown import *
+from output.model_results import *
 
 openSTAAD,STAAD_objects = get_openSTAAD()
 

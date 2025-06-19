@@ -54,6 +54,8 @@ class PiperackStructure:
         self.portal_count = None
         self.max_portal_to_portal = None
         self.portal_z_set = None
+        self.bracket_beams = None
+        self.bracket_braces = None
         
         # Beam and member categorizations
         self.steel_members = None
@@ -248,6 +250,23 @@ class Piperack:
                 not beam.start.eq_x(beam.end) and
                 not beam.start.eq_z(beam.end))
         ]
+
+        structure.bracket_beams = [
+            beam for beam in beam_objects.values()
+            if ((beam.start.eq_x(beam.end) or beam.start.eq_z(beam.end)) and
+                beam.start.eq_y(beam.end) and
+                (beam.start.x in structure.columns_z or beam.end.x in structure.columns_z or (beam.start.z in [(self.base_point_of_first_portal.z - self.bracket_size)])) and
+                (beam.start.z < self.base_point_of_first_portal.z or beam.end.z < self.base_point_of_first_portal.z)
+            )
+        ]
+
+        structure.bracket_braces = [
+            beam for beam in beam_objects.values()
+            if (
+                (beam.start.z<self.base_point_of_first_portal.z or beam.end.z<self.base_point_of_first_portal.z) and
+                beam not in set(structure.bracket_beams)
+            )
+        ]
         
         structure.long_beams = [
             beam for beam in beam_objects.values()
@@ -308,5 +327,7 @@ class Piperack:
         
         structure.portal_beam_dict = portal_beam_dict
         structure.portal_tier_beams = portal_tier_beams
+
+        
         
         return structure

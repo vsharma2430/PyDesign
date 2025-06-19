@@ -1,82 +1,74 @@
 from IPython.display import HTML
 import ipywidgets as widgets
 
-def create_html_widget_output(data):
+def create_profile_widget(data, theme='dark', title=None, icon='📊'):
     """
-    Create HTML output for displaying data in an ipywidget with professional styling.
+    Create HTML widget for displaying data with professional styling and theme support.
     
     Args:
-        data (list): List of dictionaries containing id, name, type, and country
+        data (list): List of dictionaries containing data
+        theme (str): Theme ('light' or 'dark'). Default: 'dark'
+        title (str): Custom title (optional)
+        icon (str): Title icon. Default: '📊'
         
     Returns:
-        str: HTML string ready for ipywidget display
+        widgets.HTML: HTML widget for display
     """
+    themes = {
+        'light': {
+            'bg': '#f8f9fa', 'border': '#dee2e6', 'text': '#495057', 'header': '#495057',
+            'accent': '#007bff', 'table_head_bg': '#007bff', 'table_head_text': '#ffffff',
+            'table_border': '#dee2e6', 'row_bg': '#ffffff', 'alt_row_bg': '#e9ecef',
+            'id_bg': '#28a745', 'id_text': '#ffffff', 'name': '#007bff', 'data': '#495057'
+        },
+        'dark': {
+            'bg': '#1e1e1e', 'border': '#444444', 'text': '#ffffff', 'header': '#ffffff',
+            'accent': '#00bfff', 'table_head_bg': '#0066cc', 'table_head_text': '#ffffff',
+            'table_border': '#555555', 'row_bg': '#2a2a2a', 'alt_row_bg': '#252525',
+            'id_bg': '#28a745', 'id_text': '#ffffff', 'name': '#00bfff', 'data': '#ffffff'
+        }
+    }
     
-    # Start building the HTML with professional styling
+    colors = themes.get(theme, themes['light'])
+    title = title or f"STAAD Profiles ({len(data)} records)"
+    
+    if not data:
+        html = f"<div style='padding: 20px; text-align: center; color: {colors['text']};'>No data available</div>"
+        return widgets.HTML(value=html)
+    
+    columns = list(data[0].keys())
     html = f"""
-    <div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-top: 10px; font-family: Arial, sans-serif;">
-        <h3 style="color: #495057; margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #007bff; padding-bottom: 5px;">
-            📊 STAAD Profiles ({len(data)} records)
+    <div style="background: {colors['bg']}; border: 1px solid {colors['border']}; border-radius: 8px; padding: 20px; margin-top: 10px; font-family: Arial, sans-serif; color: {colors['text']};">
+        <h3 style="color: {colors['header']}; margin: 0 0 15px; border-bottom: 2px solid {colors['accent']}; padding-bottom: 5px; font-weight: bold;">
+            {icon} {title}
         </h3>
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
-                <tr style="background-color: #007bff; color: white;">
-                    <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6; font-weight: bold;">ID</th>
-                    <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6; font-weight: bold;">Name</th>
-                    <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6; font-weight: bold;">Type</th>
-                    <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6; font-weight: bold;">Country</th>
+                <tr style="background: {colors['table_head_bg']}; color: {colors['table_head_text']};">
+                    {''.join(f'<th style="padding: 12px; text-align: left; border: 1px solid {colors['table_border']}; font-weight: bold;">{col.title()}</th>' for col in columns)}
                 </tr>
             </thead>
             <tbody>
     """
     
-    # Add data rows with alternating background colors
     for i, item in enumerate(data):
-        # Alternate row colors matching the steel widget design
-        bg_color = "#e9ecef" if i % 2 == 0 else "#ffffff"
-        
-        html += f"""
-                <tr style="background-color: {bg_color};">
-                    <td style="padding: 10px; border: 1px solid #dee2e6;">
-                        <span style="background-color: #28a745; color: white; padding: 2px 6px; border-radius: 8px; font-size: 11px; font-weight: bold;">
-                            {item['id']}
-                        </span>
-                    </td>
-                    <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold; color: #007bff;">{item['name']}</td>
-                    <td style="padding: 10px; border: 1px solid #dee2e6;">{item['type']}</td>
-                    <td style="padding: 10px; border: 1px solid #dee2e6;">{item['country']}</td>
-                </tr>
-        """
+        bg = colors['row_bg'] if i % 2 == 0 else colors['alt_row_bg']
+        html += f'<tr style="background: {bg};">'
+        for j, col in enumerate(columns):
+            value = item.get(col, '')
+            style = f"padding: 10px; border: 1px solid {colors['table_border']};"
+            if j == 0:
+                html += f'<td style="{style}"><span style="background: {colors['id_bg']}; color: {colors['id_text']}; padding: 2px 6px; border-radius: 8px; font-size: 11px; font-weight: bold;">{value}</span></td>'
+            elif j == 1:
+                html += f'<td style="{style} font-weight: bold; color: {colors['name']};">{value}</td>'
+            else:
+                html += f'<td style="{style} color: {colors['data']}; font-weight: bold;">{value}</td>'
+        html += '</tr>'
     
-    # Close the table and div
     html += """
             </tbody>
         </table>
     </div>
     """
     
-    return html
-
-
-# Example usage with your data
-def display_data_widget(data):
-    """
-    Function to use with ipywidgets HTML widget
-    """
-    # Generate HTML
-    html_content = create_html_widget_output(data)
-    
-    # Create and return the widget
-    html_widget = widgets.HTML(value=html_content)
-    
-    return html_widget
-
-# Alternative: Simple function that returns HTML string for direct use
-def get_html_string(data):
-    """
-    Simple function that returns HTML string for your data
-    Usage: 
-        html_string = get_html_string(your_data)
-        display(HTML(html_string))
-    """
-    return create_html_widget_output(data)
+    return widgets.HTML(value=html)

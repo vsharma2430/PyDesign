@@ -1,5 +1,6 @@
 import ipywidgets as widgets
 
+# Dark theme CSS with improved colors
 dark_theme_css = """
 <style>
 /* Global dark theme for widgets */

@@ -1,156 +1,89 @@
 import ipywidgets as widgets
 from IPython.display import HTML,display
-from output.dark_theme import *
+from collections import defaultdict
+from output.dark_theme import dark_layout
 
 def create_steel_section_widget(sections):
-    """
-    Create a detailed widget with dropdown and HTML info display
-    """
-    # Group sections by intended use, then by classification
-    from collections import defaultdict
-    
+    """Create a widget with dropdown and HTML info display."""
+    # Group sections
     grouped = defaultdict(lambda: defaultdict(list))
-    for section in sections:
-        grouped[section.intended_use][section.classification].append(section)
-    
-    # Create grouped options for dropdown
+    for s in sections:
+        grouped[s.intended_use][s.classification].append(s)
+
+    # Create dropdown options
     options = []
-    
-    # Sort intended uses alphabetically by their string value
-    for intended_use in sorted(grouped.keys(), key=lambda x: x.value):
-        # Add a separator/header for intended use (disabled option)
-        options.append((f"─── {intended_use.value} ───", None))
-        
-        # Sort classifications within each intended use by their string value
-        for classification in sorted(grouped[intended_use].keys(), key=lambda x: x.value):
-            # Add classification subheader if there are multiple classifications
-            if len(grouped[intended_use]) > 1:
-                options.append((f"   └─── {classification.value}", None))
-            
-            # Sort sections by section name within each classification
-            sorted_sections = sorted(grouped[intended_use][classification], 
-                                   key=lambda x: x.sl_no)
-            
-            for section in sorted_sections:
-                indent = "    " if len(grouped[intended_use]) > 1 else "  "
-                display_name = f"{indent}{section.section} ({section.unit_wt_kg_m} kg/m) - ({section.classification.value})"
-                options.append((display_name, section))
-    
-    # Find first actual section (not a separator) for default value
-    default_value = None
-    for _, value in options:
-        if value is not None:
-            default_value = value
-            break
-    
-    dropdown = widgets.Dropdown(
-        options=options,
-        value=default_value,
-        description='Steel Section:',
-        style={'description_width': 'initial'},
-        layout=widgets.Layout(width='400px')
-    )
-    
-    # Create HTML widget for details display
+    for use in sorted(grouped, key=lambda x: x.value):
+        options.append((f"─── {use.value} ───", None))
+        for cls in sorted(grouped[use], key=lambda x: x.value):
+            if len(grouped[use]) > 1:
+                options.append((f"   └─── {cls.value}", None))
+            for s in sorted(grouped[use][cls], key=lambda x: x.sl_no):
+                indent = "    " if len(grouped[use]) > 1 else "  "
+                options.append((f"{indent}{s.section} ({s.unit_wt_kg_m} kg/m) - ({cls.value})", s))
+
+    # Set default value
+    default = next((v for _, v in options if v), None)
+    dropdown = widgets.Dropdown(options=options, value=default, description='Steel Section:',
+                               style={'description_width': 'initial'}, layout={'width': '400px'})
     details_html = widgets.HTML()
 
-    def format_section_html(section):
-        """Format section data as HTML"""
+    def format_section_html(section, theme='dark'):
+        """Format section data as HTML."""
+        themes = {
+            'dark': {
+                'bg': '#1e1e1e', 'border': '#444', 'text': '#fff', 'header': '#fff', 'accent': '#00bfff',
+                'table_border': '#555', 'row_alt': '#2a2a2a', 'row': '#252525', 'label': '#fff',
+                'section': '#00bfff', 'value': '#fff', 'badge_bg': '#28a745', 'badge_text': '#fff', 'unit': '#ccc'
+            }
+        }
+        c = themes[theme]
+        get_val = lambda obj, attr, default='N/A': getattr(obj, attr, default).value if hasattr(getattr(obj, attr, default), 'value') else getattr(obj, attr, default)
+
         return f"""
-        <div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-top: 10px; font-family: Arial, sans-serif;">
-            <h3 style="color: #495057; margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #007bff; padding-bottom: 5px;">
-                📋 Section Details
-            </h3>
+        <div style="background: {c['bg']}; border: 1px solid {c['border']}; border-radius: 8px; padding: 20px; margin-top: 10px; font-family: Arial; color: {c['text']};">
+            <h3 style="color: {c['header']}; margin: 0 0 15px; border-bottom: 2px solid {c['accent']}; padding-bottom: 5px; font-weight: bold;">📋 Section Details</h3>
             <table style="width: 100%; border-collapse: collapse;">
-                <tr style="background-color: #e9ecef;">
-                    <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold; width: 40%;">EIL Serial No:</td>
-                    <td style="padding: 10px; border: 1px solid #dee2e6;">{section.sl_no}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Section:</td>
-                    <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold; color: #007bff;">{section.section}</td>
-                </tr>
-                <tr style="background-color: #e9ecef;">
-                    <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Unit Weight:</td>
-                    <td style="padding: 10px; border: 1px solid #dee2e6;">{section.unit_wt_kg_m} kg/m</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Classification:</td>
-                    <td style="padding: 10px; border: 1px solid #dee2e6;">
-                        <span style="background-color: #28a745; color: white; padding: 3px 8px; border-radius: 12px; font-size: 12px;">
-                            {section.classification.value}
-                        </span>
-                    </td>
-                </tr>
-                <tr style="background-color: #e9ecef;">
-                    <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Intended Use:</td>
-                    <td style="padding: 10px; border: 1px solid #dee2e6;">{section.intended_use.value}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">STAAD Name:</td>
-                    <td style="padding: 10px; border: 1px solid #dee2e6;">{section.staad_name}</td>
-                </tr>
+                <tr style="background: {c['row_alt']};"><td style="padding: 12px; border: 1px solid {c['table_border']}; font-weight: bold; width: 40%; color: {c['label']};">EIL Serial No:</td><td style="padding: 12px; border: 1px solid {c['table_border']}; color: {c['value']}; font-weight: bold;">{get_val(section, 'sl_no')}</td></tr>
+                <tr style="background: {c['row']};"><td style="padding: 12px; border: 1px solid {c['table_border']}; font-weight: bold; color: {c['label']};">Section:</td><td style="padding: 12px; border: 1px solid {c['table_border']}; color: {c['section']}; font-size: 16px; font-weight: bold;">{get_val(section, 'section')}</td></tr>
+                <tr style="background: {c['row_alt']};"><td style="padding: 12px; border: 1px solid {c['table_border']}; font-weight: bold; color: {c['label']};">Unit Weight:</td><td style="padding: 12px; border: 1px solid {c['table_border']}; text-align: right; color: {c['value']}; font-weight: bold;"><span style="font-size: 15px;">{get_val(section, 'unit_wt_kg_m')}</span> <span style="color: {c['unit']}; font-size: 13px;">kg/m</span></td></tr>
+                <tr style="background: {c['row']};"><td style="padding: 12px; border: 1px solid {c['table_border']}; font-weight: bold; color: {c['label']};">Classification:</td><td style="padding: 12px; border: 1px solid {c['table_border']};"><span style="background: {c['badge_bg']}; color: {c['badge_text']}; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">{get_val(section, 'classification')}</span></td></tr>
+                <tr style="background: {c['row_alt']};"><td style="padding: 12px; border: 1px solid {c['table_border']}; font-weight: bold; color: {c['label']};">Intended Use:</td><td style="padding: 12px; border: 1px solid {c['table_border']}; color: {c['value']}; font-weight: bold;">{get_val(section, 'intended_use')}</td></tr>
+                <tr style="background: {c['row']};"><td style="padding: 12px; border: 1px solid {c['table_border']}; font-weight: bold; color: {c['label']};">STAAD Name:</td><td style="padding: 12px; border: 1px solid {c['table_border']}; color: {c['value']}; font-weight: bold; font-family: monospace; background: #333; border-radius: 4px;">{get_val(section, 'staad_name')}</td></tr>
             </table>
         </div>
         """
-    
+
     def update_details(change):
-        """Update the HTML details display when selection changes"""
-        section = change['new']
-        # Only update if a valid section is selected (not a separator)
-        if section is not None:
-            details_html.value = format_section_html(section)
-    
+        """Update HTML display on selection change."""
+        if change['new']:
+            details_html.value = format_section_html(change['new'])
+
     # Initial display
     if dropdown.value:
         details_html.value = format_section_html(dropdown.value)
-    
+
     dropdown.observe(update_details, names='value')
-    
-    # Create vertical box layout
-    steel_widget = widgets.VBox([
-        dropdown,
-        details_html
-    ], layout=widgets.Layout(padding='10px'))
-    
+    steel_widget = widgets.VBox([dropdown, details_html], layout={'padding': '10px'})
     return steel_widget, dropdown
 
-
-
-def create_button(label,predicate):
-    button = widgets.Button(
-        description=label,
-        layout=dark_layout,
-    )
-    
-    def on_button_clicked(b):
-        predicate()
-        return
-    
-    button.on_click(on_button_clicked)
+def create_button(label, predicate):
+    """Create a button with a callback."""
+    button = widgets.Button(description=label, layout=dark_layout)
+    button.on_click(lambda b: predicate())
     return button
 
-def insert_profile_button_click(get_section_ref_no,
-                                steel_dropdown,
-                                staad_section_ref_nos):
-    
-    selected_section = steel_dropdown.value
-    ref_no = get_section_ref_no(selected_section=selected_section,
-                                staad_section_ref_nos=staad_section_ref_nos)
-    
-    display({'section':steel_dropdown.value.staad_name,'ref_no':ref_no})
-    return
+def insert_profile_button_click(get_section_ref_no, steel_dropdown, staad_section_ref_nos):
+    """Handle insert profile button click."""
+    selected = steel_dropdown.value
+    ref_no = get_section_ref_no(selected, staad_section_ref_nos)
+    display({'section': selected.staad_name, 'ref_no': ref_no})
 
-def apply_profile_button_click(get_section_ref_no,
-                               steel_dropdown,
-                               staad_section_ref_nos,
-                               geometry,get_selected_beam_nos,
-                               beam_list_copy_and_display,
-                               assign_profile):
-    
-    selected_section = steel_dropdown.value
-    selected_beams = get_selected_beam_nos(geometry=geometry)
-    beam_list_copy_and_display(selected_beams)
-    display(assign_profile(beams=selected_beams,property_no=get_section_ref_no(selected_section=selected_section,
-                                                                                staad_section_ref_nos=staad_section_ref_nos)))
-    return
+def apply_profile_button_click(get_section_ref_no, steel_dropdown, staad_section_ref_nos, geometry,
+                               property, get_selected_beam_nos, beam_list_copy_and_display,
+                               assign_profile, assign_material):
+    """Handle apply profile button click."""
+    selected = steel_dropdown.value
+    beams = get_selected_beam_nos(geometry)
+    beam_list_copy_and_display(beams)
+    assign_profile(beams, get_section_ref_no(selected, staad_section_ref_nos))
+    assign_material(property)('STEEL')(beams)
