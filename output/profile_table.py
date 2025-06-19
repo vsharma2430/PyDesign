@@ -33,19 +33,19 @@ def create_profile_widget(data, theme='dark', title=None, icon='📊'):
     title = title or f"STAAD Profiles ({len(data)} records)"
     
     if not data:
-        html = f"<div style='padding: 20px; text-align: center; color: {colors['text']};'>No data available</div>"
+        html = f"<div style='padding: 24px; text-align: center; color: {colors['text']};'>No data available</div>"
         return widgets.HTML(value=html)
     
     columns = list(data[0].keys())
     html = f"""
-    <div style="background: {colors['bg']}; border: 1px solid {colors['border']}; border-radius: 8px; padding: 20px; margin-top: 10px; font-family: Arial, sans-serif; color: {colors['text']};">
-        <h3 style="color: {colors['header']}; margin: 0 0 15px; border-bottom: 2px solid {colors['accent']}; padding-bottom: 5px; font-weight: bold;">
+    <div style="background: {colors['bg']}; border: 1px solid {colors['border']}; border-radius: 8px; padding: 24px; margin: 16px; font-family: Arial, sans-serif; color: {colors['text']};">
+        <h3 style="color: {colors['header']}; margin: 0 0 20px; border-bottom: 2px solid {colors['accent']}; padding-bottom: 8px; font-weight: bold;">
             {icon} {title}
         </h3>
-        <table style="width: 100%; border-collapse: collapse;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
             <thead>
                 <tr style="background: {colors['table_head_bg']}; color: {colors['table_head_text']};">
-                    {''.join(f'<th style="padding: 12px; text-align: left; border: 1px solid {colors['table_border']}; font-weight: bold;">{col.title()}</th>' for col in columns)}
+                    {''.join(f'<th style="padding: 14px; text-align: left; border: 1px solid {colors['table_border']}; font-weight: bold; line-height: 1.5;">{col.title()}</th>' for col in columns)}
                 </tr>
             </thead>
             <tbody>
@@ -56,9 +56,9 @@ def create_profile_widget(data, theme='dark', title=None, icon='📊'):
         html += f'<tr style="background: {bg};">'
         for j, col in enumerate(columns):
             value = item.get(col, '')
-            style = f"padding: 10px; border: 1px solid {colors['table_border']};"
+            style = f"padding: 12px; border: 1px solid {colors['table_border']}; line-height: 1.5;"
             if j == 0:
-                html += f'<td style="{style}"><span style="background: {colors['id_bg']}; color: {colors['id_text']}; padding: 2px 6px; border-radius: 8px; font-size: 11px; font-weight: bold;">{value}</span></td>'
+                html += f'<td style="{style}"><span style="background: {colors['id_bg']}; color: {colors['id_text']}; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: bold;">{value}</span></td>'
             elif j == 1:
                 html += f'<td style="{style} font-weight: bold; color: {colors['name']};">{value}</td>'
             else:

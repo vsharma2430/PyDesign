@@ -49,8 +49,8 @@ class ButtonBar:
         
         # Create heading widget
         heading_widget = widgets.HTML(
-            value=f'<h4 style="color: #ffffff; margin: 5px 0; font-weight: bold;">{self.heading}</h4>',
-            layout=widgets.Layout(margin='0px 0px 5px 0px')
+            value=f'<h4 style="color: #ffffff; margin: 5px; font-weight: bold;">{self.heading}</h4>',
+            layout=widgets.Layout(margin='5px')
         )
         
         # Create buttons for each key
@@ -80,7 +80,7 @@ class ButtonBar:
                 background_color='#2d2d2d',
                 border='1px solid #404040',
                 border_radius='4px',
-                margin='0px 0px 10px 0px'
+                margin='5px'
             ))
         
         # Combine heading and button bar
@@ -89,7 +89,7 @@ class ButtonBar:
                 background_color='#2d2d2d',
                 border='1px solid #404040',
                 border_radius='4px',
-                margin='0px 0px 10px 0px'
+                margin='5px'
             ))
         
         self.container = container

@@ -1,7 +1,7 @@
 import ipywidgets as widgets
-from IPython.display import HTML,display
+from IPython.display import HTML, display
 from collections import defaultdict
-from output.dark_theme import dark_layout
+from output.dark_theme import dark_layout, dark_vbox
 
 def create_steel_section_widget(sections):
     """Create a widget with dropdown and HTML info display."""
@@ -23,9 +23,14 @@ def create_steel_section_widget(sections):
 
     # Set default value
     default = next((v for _, v in options if v), None)
-    dropdown = widgets.Dropdown(options=options, value=default, description='Steel Section:',
-                               style={'description_width': 'initial'}, layout={'width': '400px'})
-    details_html = widgets.HTML()
+    dropdown = widgets.Dropdown(
+        options=options,
+        value=default,
+        description='Steel Section : ',
+        style={'description_width': 'initial'},
+        layout={'width': '550px', 'margin': '5px'}
+    )
+    details_html = widgets.HTML(layout={'width': '550px', 'margin': '5px'})
 
     def format_section_html(section, theme='dark'):
         """Format section data as HTML."""
@@ -40,7 +45,7 @@ def create_steel_section_widget(sections):
         get_val = lambda obj, attr, default='N/A': getattr(obj, attr, default).value if hasattr(getattr(obj, attr, default), 'value') else getattr(obj, attr, default)
 
         return f"""
-        <div style="background: {c['bg']}; border: 1px solid {c['border']}; border-radius: 8px; padding: 20px; margin-top: 10px; font-family: Arial; color: {c['text']};">
+        <div style="background: {c['bg']}; border: 1px solid {c['border']}; border-radius: 8px; padding: 2%; margin: 0; font-family: Arial; color: {c['text']}; width: 100%;">
             <h3 style="color: {c['header']}; margin: 0 0 15px; border-bottom: 2px solid {c['accent']}; padding-bottom: 5px; font-weight: bold;">📋 Section Details</h3>
             <table style="width: 100%; border-collapse: collapse;">
                 <tr style="background: {c['row_alt']};"><td style="padding: 12px; border: 1px solid {c['table_border']}; font-weight: bold; width: 40%; color: {c['label']};">EIL Serial No:</td><td style="padding: 12px; border: 1px solid {c['table_border']}; color: {c['value']}; font-weight: bold;">{get_val(section, 'sl_no')}</td></tr>
@@ -63,7 +68,29 @@ def create_steel_section_widget(sections):
         details_html.value = format_section_html(dropdown.value)
 
     dropdown.observe(update_details, names='value')
-    steel_widget = widgets.VBox([dropdown, details_html], layout={'padding': '10px'})
+    # Handle dark_vbox as a list
+    if isinstance(dark_vbox, list):
+        # If dark_vbox is a list with a dictionary, use the first dictionary
+        if dark_vbox and isinstance(dark_vbox[0], dict):
+            layout_dict = dark_vbox[0]
+        else:
+            # Fallback to default layout if dark_vbox is a list but not usable
+            layout_dict = {'background': '#1e1e1e', 'border': '1px solid #444', 'padding': '5px'}
+    else:
+        # Assume dark_vbox is already a dictionary
+        layout_dict = dark_vbox if isinstance(dark_vbox, dict) else {}
+
+    # Merge with fixed width properties
+    layout_dict.update({
+        'width': '600px',
+        'max_width': '600px',
+        'margin': '5px auto'
+    })
+
+    steel_widget = widgets.VBox(
+        [dropdown, details_html],
+        layout=layout_dict
+    )
     return steel_widget, dropdown
 
 def create_button(label, predicate):
