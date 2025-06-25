@@ -7,3 +7,4 @@ pip install pywin32
 pip install comtypes
 pip install jupyter
 pip install pyperclip
+pip install PyQt6
